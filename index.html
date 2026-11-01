@@ -1,0 +1,998 @@
+<!doctype html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Strong Inference Workflow</title>
+<meta charset="utf-8">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout concept: a lab bench. The cycle map and its readout sit under a sticky timeline; the notebook below only ever grows. Colors keep the drawio's vocabulary. */
+:root {
+  --bg: #eef2f3; --panel: #fbfcfc; --ink: #15242c; --muted: #566870; --rule: #cdd7da; --grid: #e0e7e9;
+  --step-bg: #dae8fc; --step-line: #5580b0; --gate-bg: #fff2cc; --gate-line: #b5952f; --out-bg: #edeeee; --out-line: #858c8f;
+  --tree-bg: #d5e8d4; --tree-line: #5f9458; --stop-bg: #e8dcee; --stop-line: #8a62a0; --pop-bg: #ffe6cc; --pop-line: #c9822e; --box-bg: #ffffff;
+  --back: #2f6da8; --recycle: #b5433e; --new-obj: #8a62a0; --read: #4b8a44; --flow: #435660;
+  --before: #4f86c0; --run: #15242c; --after: #5f9458; --fresh: #fff0a8;
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --body: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #121a1f; --panel: #1a242a; --ink: #e6edef; --muted: #9aabb2; --rule: #33424a; --grid: #1c272d;
+  --step-bg: #1f3650; --step-line: #6d9bd0; --gate-bg: #40361a; --gate-line: #cfae4c; --out-bg: #2a3236; --out-line: #8d979b;
+  --tree-bg: #1f3a24; --tree-line: #72ad6a; --stop-bg: #33273c; --stop-line: #ab86c2; --pop-bg: #40301d; --pop-line: #d99a4c; --box-bg: #222e35;
+  --back: #70a9e0; --recycle: #e4726c; --new-obj: #ba95d1; --read: #79b971; --flow: #a3b4bb;
+  --before: #6d9bd0; --run: #e6edef; --after: #79b971; --fresh: #5a4f18; color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --bg: #121a1f; --panel: #1a242a; --ink: #e6edef; --muted: #9aabb2; --rule: #33424a; --grid: #1c272d;
+  --step-bg: #1f3650; --step-line: #6d9bd0; --gate-bg: #40361a; --gate-line: #cfae4c; --out-bg: #2a3236; --out-line: #8d979b;
+  --tree-bg: #1f3a24; --tree-line: #72ad6a; --stop-bg: #33273c; --stop-line: #ab86c2; --pop-bg: #40301d; --pop-line: #d99a4c; --box-bg: #222e35;
+  --back: #70a9e0; --recycle: #e4726c; --new-obj: #ba95d1; --read: #79b971; --flow: #a3b4bb;
+  --before: #6d9bd0; --run: #e6edef; --after: #79b971; --fresh: #5a4f18; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 var(--body); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--panel); }
+.wrap { max-width: 1480px; margin-inline: auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--display); font-weight: 700; text-wrap: balance; margin: 0; line-height: 1.12; }
+h1 { font-size: clamp(30px, 4.2vw, 50px); letter-spacing: -0.02em; }
+h2 { font-size: clamp(22px, 2.4vw, 30px); letter-spacing: -0.01em; }
+h3 { font-size: 16px; }
+p { margin: 0; }
+.mono { font-family: var(--mono); font-size: .9em; }
+.label { font: 500 11px/1.3 var(--mono); letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+
+/* Opening */
+header { padding-block: 32px 22px; display: grid; gap: 14px 40px; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: end; }
+.lead { font-size: 17px; max-width: 66ch; margin-top: 12px; }
+.status { border: 1px dashed var(--gate-line); padding: 12px 14px; max-width: 62ch; font-size: 14px; }
+.status b { font-weight: 600; }
+
+/* Timeline */
+.player { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--panel); border-block: 1px solid var(--rule); }
+.player .wrap { padding-block: 9px; display: grid; gap: 8px; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; }
+button, select { font: 500 13px/1 var(--body); color: var(--ink); background: var(--box-bg); border: 1px solid var(--rule); border-radius: 3px; padding: 8px 11px; cursor: pointer; }
+button:hover, select:hover { border-color: var(--ink); }
+:focus-visible { outline: 2px solid var(--back); outline-offset: 2px; }
+#play { background: var(--ink); color: var(--bg); border-color: var(--ink); min-width: 78px; font-weight: 600; }
+.seg { display: inline-flex; }
+.seg button { border-radius: 0; margin-left: -1px; padding-inline: 9px; }
+.seg button:first-child { border-radius: 3px 0 0 3px; margin-left: 0; }
+.seg button:last-child { border-radius: 0 3px 3px 0; }
+.seg button[aria-pressed="true"] { background: var(--step-bg); border-color: var(--step-line); position: relative; }
+#where { font: 500 12px/1.3 var(--mono); color: var(--muted); margin-left: auto; font-variant-numeric: tabular-nums; }
+.ticks-box { overflow-x: auto; }
+#ticks { display: flex; gap: 5px; min-width: 640px; }
+.cyc { min-width: 0; display: grid; gap: 3px; }
+.cyc .label { white-space: nowrap; overflow: hidden; }
+.cyc-ticks { display: flex; gap: 1px; align-items: flex-end; height: 22px; }
+.tick { flex: 1; min-width: 0; height: 12px; padding: 0; border: 0; border-radius: 0; opacity: .5; }
+.tick:hover { opacity: 1; height: 18px; }
+.tick.before { background: var(--before); } .tick.during { background: var(--run); } .tick.after { background: var(--after); }
+.tick.past { opacity: .95; }
+.tick.fail { box-shadow: inset 0 3px 0 var(--recycle); }
+.tick.now { height: 22px; opacity: 1; outline: 2px solid var(--ink); outline-offset: 0; z-index: 1; }
+.key { display: flex; flex-wrap: wrap; gap: 3px 14px; font-size: 12px; color: var(--muted); }
+.key i { display: inline-block; width: 11px; height: 9px; margin-right: 5px; }
+
+/* Bench */
+.bench { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(320px, 1fr); gap: 14px; padding-block: 14px; align-items: start; }
+.map-box { background-color: var(--panel); background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 22px 22px; border: 1px solid var(--rule); overflow-x: auto; }
+#map { display: block; width: 100%; min-width: 760px; height: auto; }
+#map text { font-family: var(--body); fill: var(--ink); }
+.mapnode { cursor: pointer; }
+.mapnode .sh { stroke-width: 1.3; transition: stroke-width .15s; }
+.mapnode.step .sh { fill: var(--step-bg); stroke: var(--step-line); }
+.mapnode.gate .sh { fill: var(--gate-bg); stroke: var(--gate-line); }
+.mapnode.out .sh { fill: var(--out-bg); stroke: var(--out-line); }
+.mapnode.stop .sh { fill: var(--stop-bg); stroke: var(--stop-line); }
+.mapnode.tree .sh { fill: var(--tree-bg); stroke: var(--tree-line); }
+.mapnode.box .sh { fill: var(--box-bg); stroke: var(--step-line); }
+.mapnode .tt { font-size: 13px; font-weight: 600; }
+.mapnode.gate .tt, .mapnode.out .tt { font-size: 12px; font-weight: 500; }
+.mapnode:hover .sh { stroke-width: 2.4; }
+.mapnode:focus { outline: none; }
+.mapnode:focus-visible .sh { stroke: var(--back); stroke-width: 3; }
+.mapnode.viewed .sh { stroke: var(--ink); stroke-width: 2.2; stroke-dasharray: 4 3; }
+.mapnode.now .sh { stroke: var(--ink); stroke-width: 3.4; stroke-dasharray: none; }
+.halo { fill: none; stroke: var(--ink); stroke-width: 2; opacity: 0; pointer-events: none; }
+.mapnode.now .halo { animation: halo 1.8s ease-out infinite; }
+@keyframes halo { 0% { opacity: .55; } 100% { opacity: 0; transform: scale(1.1); } }
+.mini { fill: var(--box-bg); stroke: var(--step-line); }
+.mini.ph { stroke-dasharray: 3 3; }
+.mini-t { font-size: 10.5px; }
+.frame { fill: none; stroke: var(--muted); stroke-dasharray: 5 4; }
+.frame.solid { fill: var(--panel); fill-opacity: .55; stroke: var(--step-line); stroke-dasharray: none; }
+.frame-t { font-size: 11px; font-style: italic; fill: var(--muted) !important; }
+.ed { fill: none; stroke-width: 1.5; }
+.ed.flow { stroke: var(--flow); } .ed.back { stroke: var(--back); } .ed.recycle { stroke: var(--recycle); stroke-width: 2.3; }
+.ed.newobj { stroke: var(--new-obj); stroke-width: 1.9; } .ed.read { stroke: var(--read); stroke-dasharray: 5 4; }
+.ed { opacity: .5; transition: opacity .2s, stroke-width .2s; }
+.ed.walked { opacity: 1; }
+.ed.taken, .ed.moving { opacity: 1; stroke-width: 3.6; }
+.ed.untaken { opacity: .14; }
+.el { font-size: 11px; fill: var(--muted) !important; }
+.el.recycle { fill: var(--recycle) !important; } .el.back { fill: var(--back) !important; } .el.newobj { fill: var(--new-obj) !important; } .el.read { fill: var(--read) !important; }
+#dot { fill: var(--ink); stroke: var(--panel); stroke-width: 2; pointer-events: none; }
+.pop { fill: var(--pop-line); stroke: var(--panel); stroke-width: 1.4; pointer-events: none; }
+.count { font: 500 11.5px var(--mono) !important; }
+.count-n { font: 500 20px var(--mono) !important; font-variant-numeric: tabular-nums; }
+.map-foot { padding: 8px 12px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--rule); background: var(--panel); display: flex; flex-wrap: wrap; gap: 3px 16px; min-width: 760px; }
+.swatch { display: inline-block; width: 20px; height: 0; border-top: 2px solid; vertical-align: middle; margin-right: 5px; }
+.dotkey { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--pop-line); margin-right: 5px; }
+
+/* Readout */
+#readout { background: var(--panel); border: 1px solid var(--rule); padding: 14px 16px 16px; display: grid; gap: 12px; min-width: 0; }
+.r-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.r-head h2 { font-size: 23px; flex: 1 1 100%; }
+.when { font: 500 11px/1 var(--mono); padding: 4px 6px; border: 1px solid; }
+.when.before { color: var(--before); } .when.during { color: var(--ink); } .when.after { color: var(--after); }
+.story { background: var(--bg); padding: 10px 12px; display: grid; gap: 7px; }
+.answer { font-weight: 600; }
+.story p { font-size: 15px; }
+.writes { display: grid; gap: 3px; font-size: 13px; border-top: 1px solid var(--rule); padding-top: 7px; }
+.writes div { padding-left: 14px; text-indent: -14px; }
+.writes div::before { content: "\2192\00a0"; color: var(--read); }
+.wrote-none { font-size: 13px; color: var(--muted); }
+.fields { display: grid; gap: 9px; margin: 0; }
+.fields > div { display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 8px; }
+.fields dt { font: 500 11px/1.75 var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+.fields dd { margin: 0; font-size: 14px; }
+.fields .pop-row dt { color: var(--pop-line); }
+.src { font-size: 12.5px; color: var(--muted); }
+.occ { display: flex; flex-wrap: wrap; gap: 4px; }
+.occ button { padding: 4px 6px; font: 500 11px var(--mono); }
+.inf { font-size: 11px; font-family: var(--mono); color: var(--muted); }
+
+/* Notebook */
+section { padding-block: 20px; }
+.sec-head { display: grid; gap: 5px; margin-bottom: 12px; }
+.sec-head p { max-width: 72ch; color: var(--muted); }
+#objective { background: var(--panel); border: 1px solid var(--rule); padding: 10px 14px; display: flex; flex-wrap: wrap; gap: 10px 26px; align-items: center; margin-bottom: 10px; }
+#objective .o { flex: 1 1 340px; min-width: 0; font-size: 14px; }
+.meters { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.meter { width: 118px; font: 500 11px/1.3 var(--mono); }
+.meter .bar { height: 6px; background: var(--grid); margin-top: 3px; }
+.meter .bar i { display: block; height: 100%; background: var(--flow); transition: width .3s; }
+.book { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 12px; align-items: start; }
+.shelf { background: var(--panel); border: 1px solid var(--rule); padding: 12px 14px; min-width: 0; }
+.shelf > h3 { margin-bottom: 3px; }
+.shelf > .hint { font-size: 12.5px; color: var(--muted); margin-bottom: 9px; }
+.side { display: grid; gap: 12px; min-width: 0; }
+.empty { font-size: 13px; color: var(--muted); font-style: italic; }
+.tnode { border-left: 3px solid var(--tree-line); padding: 2px 0 4px 11px; margin-bottom: 14px; }
+.tnode.child { margin-left: 22px; position: relative; }
+.tnode.child::before { content: ""; position: absolute; left: -24px; top: 12px; width: 20px; border-top: 1px solid var(--tree-line); }
+.tnode .q { font-weight: 600; font-size: 14.5px; }
+.tnode .q .mono { color: var(--muted); font-weight: 500; margin-right: 5px; }
+.note { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+.h-row { display: grid; grid-template-columns: 74px minmax(0, 1fr) auto; gap: 2px 8px; font-size: 13px; padding-block: 4px; border-top: 1px solid var(--rule); align-items: baseline; }
+.h-row:first-of-type { margin-top: 6px; }
+.h-row .pr { display: block; color: var(--muted); font-size: 12px; }
+.h-row.excluded .tx { text-decoration: line-through; text-decoration-color: var(--recycle); color: var(--muted); }
+.h-row.placeholder { border-top-style: dashed; }
+.chip { font: 500 10.5px/1.2 var(--mono); padding: 2px 5px; border: 1px solid var(--rule); white-space: nowrap; }
+.chip.live { border-color: var(--step-line); } .chip.corroborated { background: var(--tree-bg); border-color: var(--tree-line); }
+.chip.excluded { border-color: var(--recycle); color: var(--recycle); } .chip.untested, .chip.placeholder { border-style: dashed; }
+.chip.open { background: var(--gate-bg); border-color: var(--gate-line); } .chip.promoted { background: var(--step-bg); border-color: var(--step-line); }
+.chip.closed { background: var(--tree-bg); border-color: var(--tree-line); } .chip.dropped, .chip.deferred { color: var(--muted); }
+.chip.true { background: var(--out-bg); }
+.runs { display: grid; gap: 2px; margin-top: 6px; padding-top: 5px; border-top: 1px dotted var(--rule); font-size: 12.5px; }
+.runs .run { padding-left: 42px; text-indent: -42px; }
+.runs .mono { display: inline-block; width: 42px; text-indent: 0; font-weight: 500; }
+.runs .pending { color: var(--muted); }
+.f-card { padding-block: 7px; border-top: 1px solid var(--rule); font-size: 13px; }
+.f-card:first-of-type { border-top: 0; padding-top: 0; }
+.f-card .fh { display: flex; flex-wrap: wrap; gap: 3px 7px; align-items: baseline; }
+.trail { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 5px; }
+.trail button { font: 500 10.5px/1.2 var(--mono); padding: 3px 5px; }
+.logline { font-size: 13px; padding-block: 5px; border-top: 1px solid var(--rule); }
+.logline:first-of-type { border-top: 0; }
+.know { background: var(--tree-bg); border-color: var(--tree-line); }
+.know .hint { color: var(--ink); opacity: .8; }
+.know li { font-size: 13.5px; padding-block: 3px; }
+.know ul { margin: 0; padding-left: 17px; }
+.know .runs-of { font: 500 11px var(--mono); white-space: nowrap; }
+.fresh { animation: fresh 2.6s ease-out; }
+@keyframes fresh { 0%, 45% { background: var(--fresh); } 100% { background: transparent; } }
+
+/* Reference */
+.tw { overflow-x: auto; background: var(--panel); border: 1px solid var(--rule); }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; min-width: 700px; }
+th { text-align: left; font: 500 11px/1.3 var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+th, td { padding: 8px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+td:first-child { font-weight: 600; white-space: nowrap; }
+.journey { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0; list-style: none; padding: 0; margin: 12px 0 0; counter-reset: j; }
+.journey li { padding: 9px 10px; border: 1px solid var(--rule); margin-left: -1px; background: var(--panel); font-size: 13px; min-width: 0; }
+.journey b { display: block; font-family: var(--display); font-size: 15px; }
+.journey .label { display: block; margin-block: 2px 5px; }
+.two { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+.plain { margin: 0; padding-left: 17px; font-size: 14px; }
+.plain li { padding-block: 2px; }
+footer { padding-block: 14px 34px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--rule); margin-top: 8px; }
+@media (max-width: 1160px) { .bench, .book, .two { grid-template-columns: minmax(0, 1fr); } .journey { grid-template-columns: repeat(2, minmax(0, 1fr)); } header { grid-template-columns: minmax(0, 1fr); } }
+select { max-width: 100%; }
+@media (max-width: 640px) { .key { display: none; } #example { flex: 1 1 100%; width: 100%; min-width: 0; } #where { margin-left: 0; flex-basis: 100%; } .journey { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) { .mapnode.now .halo, .fresh { animation: none; } .fresh { background: var(--fresh); } .ed, .mapnode .sh, .meter .bar i { transition: none; } }
+</style>
+
+<div class="wrap">
+<header>
+  <div>
+    <p class="label">Research method, drawn as a working cycle</p>
+    <h1 style="margin-top:7px">Strong inference, one step at a time</h1>
+    <p class="lead">Strong inference is a way to do research: write several rival explanations, design an experiment that rules some of them out, then repeat with what is left. Press Play to watch an invented ML project move through the workflow, and see what each step needs, does, produces and stores.</p>
+  </div>
+  <p class="status"><b>An untested concept.</b> Nobody has run this workflow on a real problem. Every run and number in the walkthrough is invented, except the two facts marked (real). The “needs” and “outputs” fields are this page’s summary of the diagram and its explanation.</p>
+</header>
+</div>
+
+<div class="player">
+  <div class="wrap">
+    <div class="controls">
+      <button id="play" type="button">▶ Play</button>
+      <button id="prev" type="button" aria-label="Previous moment">← Back</button>
+      <button id="next" type="button" aria-label="Next moment">Next →</button>
+      <span class="seg" role="group" aria-label="Speed">
+        <button type="button" data-speed="1.6" aria-pressed="false">Slow</button>
+        <button type="button" data-speed="1" aria-pressed="true">Normal</button>
+        <button type="button" data-speed=".5" aria-pressed="false">Fast</button>
+      </span>
+      <select id="example" aria-label="Choose an example">
+        <option value="0">Example 1: a local score that misleads (3 cycles)</option>
+        <option value="1">Example 2: a reported gain with several causes (2 rounds)</option>
+      </select>
+      <span id="where" aria-live="off"></span>
+    </div>
+    <div class="ticks-box"><div id="ticks"></div></div>
+    <div class="key">
+      <span><i style="background:var(--before)"></i>Written before the run</span>
+      <span><i style="background:var(--run)"></i>The run</span>
+      <span><i style="background:var(--after)"></i>After the result</span>
+      <span><i style="background:var(--panel);box-shadow:inset 0 3px 0 var(--recycle)"></i>Run not clean</span>
+      <span>Arrow keys step, space plays</span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="bench">
+    <div class="map-box">
+      <svg id="map" viewBox="0 -4 1030 650" role="group" aria-label="The cycle. Select any box to read about it."></svg>
+      <div class="map-foot">
+        <span><span class="swatch" style="border-color:var(--flow)"></span>Next step</span>
+        <span><span class="swatch" style="border-color:var(--back)"></span>Back to an earlier step</span>
+        <span><span class="swatch" style="border-color:var(--recycle)"></span>Recycle</span>
+        <span><span class="swatch" style="border-color:var(--new-obj)"></span>New objective</span>
+        <span><span class="swatch" style="border-color:var(--read);border-top-style:dashed"></span>Read or write the tree</span>
+        <span><span class="dotkey"></span>A Popper rule applies here</span>
+      </div>
+    </div>
+    <aside id="readout" aria-live="polite"></aside>
+  </div>
+
+  <section id="notebook-sec">
+    <div class="sec-head">
+      <h2>The notebook, as of this moment</h2>
+      <p>This is what the project has kept so far. Nothing is erased: an excluded hypothesis stays with the run that excluded it, so nobody walks that road again. Scrub the timeline and watch it grow.</p>
+    </div>
+    <div id="objective"></div>
+    <div class="book">
+      <div class="shelf">
+        <h3>Logical tree</h3>
+        <p class="hint">A node is a question and its hypotheses. An experiment is an edge, and its outcome picks the branch.</p>
+        <div id="tree"></div>
+      </div>
+      <div class="side">
+        <div class="shelf know">
+          <h3>Project knowledge</h3>
+          <p class="hint">What holds, with its runs and conditions. The next project reads this at step 2.</p>
+          <div id="know"></div>
+        </div>
+        <div class="shelf">
+          <h3>Findings</h3>
+          <p class="hint">What nobody predicted. A finding suggests a question and supports nothing yet. Select a stage in its trail to jump there.</p>
+          <div id="finds"></div>
+        </div>
+        <div class="shelf">
+          <h3>Rescue log and hygiene</h3>
+          <p class="hint">Every not-clean run is logged with its cause. A hypothesis saved repeatedly is excluded.</p>
+          <div id="logs"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>How knowledge is kept, and what limits it</h2>
+      <p>Each kind of record is written at one step and read at another. Each can also be undone: nothing in the tree is final.</p>
+    </div>
+    <div class="tw"><table>
+      <thead><tr><th>Record</th><th>What it says</th><th>Written</th><th>Read</th><th>What can undo it</th></tr></thead>
+      <tbody>
+        <tr><td>Exclusion</td><td>This hypothesis failed, in this run, on a test of this severity.</td><td>Step 9</td><td>Tree, at steps 2, 3 and 4</td><td>A change of conditions or a contradicting result reopens it as a finding.</td></tr>
+        <tr><td>Survivor</td><td>Best of this family, not proven. “None of the above” stays live.</td><td>Step 9</td><td>Step 10, where it must pass its own risky test</td><td>A failed use at step 10, or what the Stop report names as still able to refute it.</td></tr>
+        <tr><td>Finding</td><td>Something no hypothesis predicted, with its size and run.</td><td>Step 8, kept at step 9</td><td>Step 3 every cycle, step 4 after a recycle</td><td>A decision with a reason: promote, defer or drop.</td></tr>
+        <tr><td>Rescue log</td><td>A run was not clean. Its cause, and the declared auxiliary that was blamed.</td><td>The not-clean branch</td><td>Whenever a hypothesis keeps being saved</td><td>It does not go away. A hypothesis saved repeatedly is excluded.</td></tr>
+        <tr><td>Project knowledge</td><td>What holds, the runs behind it, and the conditions they ran under.</td><td>Step 10</td><td>Step 2 of the next project</td><td>The same rule as exclusions: it holds under its conditions.</td></tr>
+      </tbody>
+    </table></div>
+    <h3 style="margin-top:20px">The life of a finding</h3>
+    <ol class="journey">
+      <li><b>Seen</b><span class="label">Step 8 · open</span>The standing checks show it. It is written with its size and run.</li>
+      <li><b>Kept</b><span class="label">Step 9 · open</span>It is recorded, whatever the gates decide about the hypotheses.</li>
+      <li><b>Reopened</b><span class="label">Any time · open</span>Changed conditions turn an old exclusion into a new finding.</li>
+      <li><b>Decided</b><span class="label">Step 3 · 3 ways</span>Repeats and needed: promote. Repeats, not needed: defer. Does not repeat: drop.</li>
+      <li><b>Tested</b><span class="label">Steps 4 to 7 · promoted</span>It becomes a how or why question with rivals and a new experiment.</li>
+      <li><b>Used</b><span class="label">Step 10 · closed</span>The surviving explanation changes something, and the change is measured.</li>
+      <li><b>Reported</b><span class="label">Stop · unchanged</span>Every finding is listed with its status, so stopping cannot lose one.</li>
+    </ol>
+    <p style="margin-top:12px;max-width:80ch">Three obligations hold this together: step 9 needs a findings entry, even if empty; step 3 needs a decision on each open finding; Stop needs every finding’s status. These are rules of the method. For now they rest on the researcher’s discipline, and nothing checks them.</p>
+  </section>
+
+  <section class="two">
+    <div>
+      <div class="sec-head"><h2>Where each piece comes from</h2></div>
+      <div class="tw"><table>
+        <thead><tr><th>Source</th><th>What it adds</th></tr></thead>
+        <tbody>
+          <tr><td>Platt, 1964</td><td>Alternative hypotheses, the crucial experiment, the clean result, recycling, and the logical tree in a daily notebook.</td></tr>
+          <tr><td>Chamberlin, 1890</td><td>Hold every rational explanation at once, and allow several causes in varying proportions.</td></tr>
+          <tr><td>Fudge, 2014</td><td>The front end: observe, question, predict, and the gates on each.</td></tr>
+          <tr><td>Popper, 1963</td><td>Start from a problem, forbid outcomes, risk the prediction, never rescue ad hoc. Marked with an orange dot on the map.</td></tr>
+          <tr><td>Railsback</td><td>“None of the above” as a placeholder, and untested is not excluded.</td></tr>
+          <tr><td>Lakatos, Mayo, Meehl</td><td>Repeated rescue degenerates; severity; a direction alone risks little. Their notes rest on summaries, one posted section and memory, not on a primary text.</td></tr>
+          <tr><td>This workflow</td><td>Steps 8 and 10, the path of a finding, and the rule for reopening exclusions. No source has these; the explanation marks them as inference.</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+    <div>
+      <div class="sec-head"><h2>Left out on purpose</h2><p>These wait until a first working skeleton shows a need.</p></div>
+      <ul class="plain">
+        <li>Independent checking: who runs, who judges, who sees what</li>
+        <li>Reusing data across cycles, which can overfit even a holdout set</li>
+        <li>Making sure rival hypotheses really differ</li>
+        <li>Choosing what is worth doing next, by value and cost</li>
+        <li>Whether the measure captures the objective</li>
+        <li>Whether all these rules pay for their cost</li>
+        <li>Thresholds: how many hypotheses, seeds or checks are enough</li>
+        <li>Recording pruned hypotheses</li>
+        <li>Outside criticism and independent replication</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>Built from <span class="mono">strong_inference_workflow.drawio</span>, <span class="mono">workflow_explanation.md</span>, <span class="mono">applied_example.md</span> and <span class="mono">applied_example_2.md</span> at commit <span class="mono">294b092</span>. Neither example reaches “Several rivals, or undecided”, or step 8’s edge back to “Know the field”, so those two paths never light up.</footer>
+</div>
+
+<script>
+"use strict";
+/* ---------- The cycle: boxes and what each one is for ---------- */
+const NODES = {
+  s0: {kind:"step", x:20,y:40,w:130,h:62, tt:["0. Define","the objective"], tag:"Step 0", name:"Define the objective", when:"before",
+    needs:"A problem. On a later objective, whatever project knowledge already holds.",
+    does:"Fix three things before anything is measured: the question the whole tree serves, what counts as done, and how much can be spent.",
+    outputs:"A root question, a stop criterion and a budget.",
+    stores:"The root of the tree.",
+    why:"It comes first because inquiry starts from a problem, not from observation. The objective can change later, by the purple edge from Stop.",
+    src:"Popper on the placement. Chamberlin warns against vacillation. Platt has no stopping rule, which is why this step exists.",
+    popper:"Start from a problem; hypotheses are bold guesses, not inductions."},
+  s1: {kind:"step", x:187,y:52,w:120,h:46, tt:["1. Questions","for the review"], tag:"Step 1", name:"Write questions to guide the review", when:"before",
+    needs:"The objective, and what the tree already holds.",
+    does:"Write down what you need to learn before you start reading or looking.",
+    outputs:"A short list of questions for step 2.",
+    stores:"Nothing in the tree. The questions go in the notebook.",
+    why:"Written first, the questions keep the review pointed at the objective.",
+    src:"Jewett’s exploratory phase. Chamberlin: first full facts, then interpretations."},
+  s2: {kind:"step", x:187,y:120,w:120,h:46, tt:["2. Review, pilots,","baselines"], tag:"Step 2", name:"Literature review, observations, pilots and baselines", when:"before",
+    needs:"The questions from step 1. The tree and project knowledge, read here by the green edge.",
+    does:"Read, look at the data, run small pilots and baselines. A pilot measures the noise, so a real gap can be told from chance.",
+    outputs:"Background knowledge and puzzles.",
+    stores:"Notes in the notebook.",
+    why:"A second project starts here from what the first one excluded, instead of from zero.",
+    src:"Popper’s correction: this is background for designing refutations. Hypotheses are guesses made at step 4.",
+    popper:"Hypotheses do not come from the review. It supplies the background for refuting them."},
+  ans: {kind:"box", x:325,y:120,w:118,h:46, tt:["Answer","questions"], tag:"Inside the loop", name:"Answer the questions", when:"before",
+    needs:"What the review, pilots and baselines showed.",
+    does:"Say which questions are answered and which stay open.",
+    outputs:"Answers, and new questions that appeared.",
+    stores:"Notes in the notebook.",
+    why:"The loop ends when a question is worth pursuing, usually because a puzzle is on the table.",
+    src:"Jewett’s pilot phase."},
+  ref: {kind:"box", x:325,y:52,w:118,h:46, tt:["Refine","questions"], tag:"Inside the loop", name:"Refine the questions", when:"before",
+    needs:"The answers so far.",
+    does:"Sharpen the questions and go round again, until a question is worth pursuing.",
+    outputs:"A better set of questions for step 1.",
+    stores:"Notes in the notebook.",
+    why:"The loop may run several times before moving on. The walkthrough shows each pass as one moment.",
+    src:"Jewett’s pilot phase."},
+  s3: {kind:"step", x:490,y:50,w:130,h:70, tt:["3. Pick a question","and decide open","findings first"], tag:"Step 3", name:"Pick a question", when:"before",
+    needs:"Open findings, read from the tree. What is unanswered or puzzling.",
+    does:"First decide each open finding: promote if it repeats on new data, defer or drop, with a reason. Then pick from what is unanswered or puzzling.",
+    outputs:"A candidate question for the gate.",
+    stores:"Each finding’s new status and its reason.",
+    why:"Findings are decided first, so one logged at step 8 cannot pass through a cycle unseen.",
+    src:"Fudge: only puzzling observations have value, because they signal the current explanation may be wrong."},
+  g3: {kind:"gate", cx:720,cy:85,w:130,h:90, tt:["How or why, and","serves objective?"], tag:"Gate", name:"How or why question that serves the objective?", when:"before",
+    needs:"The candidate question and the objective.",
+    does:"Reject “what is the effect of x on y”: that needs a measurement, not a method. The question must also be specific enough that alternatives can be stated.",
+    outputs:"Yes: go to step 4. No: back to the know-the-field loop.",
+    stores:"A question that passes becomes a node of the tree.",
+    why:"It blocks effort on a question that cannot exclude anything.",
+    src:"Fudge. O’Donohue and Buchanan’s objection on specificity."},
+  s4: {kind:"step", x:660,y:150,w:320,h:78, tt:["4. Write the family of hypotheses, prune"], tag:"Step 4", name:"Write the family of hypotheses, then prune to a handful", when:"before",
+    needs:"The question. Findings too, because a recycle lands here and skips step 3. The new facts from the last round.",
+    does:"Bring every rational explanation into view at once, with combinations and the placeholder “None of the above”. Keep about five. Each must answer the question and forbid some outcome. Prefer the bold one that says more.",
+    outputs:"A handful of rival hypotheses.",
+    stores:"The node’s live hypotheses. Pruned claims are not recorded in the tree.",
+    why:"Several at once, so that no single explanation captures the investigator’s affection. This is invention: nothing is measured here.",
+    src:"Chamberlin. Railsback’s none of the above. Szilard’s count. Fudge’s gate.",
+    popper:"A good hypothesis forbids outcomes; prefer the bold hypothesis with more content."},
+  s5: {kind:"step", x:660,y:240,w:320,h:78, tt:["5. For each hypothesis, derive predictions"], tag:"Step 5", name:"For each hypothesis, derive the predictions it makes", when:"before",
+    needs:"The hypotheses, and what the pilot says is expected anyway.",
+    does:"Keep only risky predictions: ones the hypothesis cannot survive being wrong about, that would not be expected without it, and that state a size and a condition, not only a direction.",
+    outputs:"One row of predictions per hypothesis. The placeholder has none.",
+    stores:"The predictions, written beside their hypotheses.",
+    why:"They come before the design because the experiment has to separate them. Step 10 also returns here, since a use is a new prediction.",
+    src:"Fudge’s critical prediction. Popper’s risky prediction. Meehl: a direction alone is barely risky.",
+    popper:"Confirmations count only when they came from a risky prediction."},
+  s6: {kind:"step", x:660,y:330,w:320,h:56, tt:["6. Design the crucial experiment"], tag:"Step 6", name:"Design the crucial experiment", when:"before",
+    needs:"The predictions. On a return from the not-clean gate, the cause of the failure.",
+    does:"Write which hypotheses each outcome excludes, what counts as a refutation (effect size, seeds, power), which auxiliary assumptions may be blamed, and the controls. It must be informative either way.",
+    outputs:"An outcome-to-exclusion table and a decision rule.",
+    stores:"The design, in the notebook, before anything runs.",
+    why:"Writing all this before the run stops the result from choosing its own explanation. This is the last moment anything can be decided freely.",
+    src:"Bacon’s instance of the fingerpost, through Platt. Burch’s outcome table. Mayo and the ML falsifiability papers on the decision rule.",
+    popper:"Decide beforehand what is being tested and what may be blamed."},
+  s7: {kind:"step", x:800,y:420,w:180,h:56, tt:["7. Run, and check the","run matched the design"], tag:"Step 7", name:"Run the experiment", when:"during",
+    needs:"The design from step 6, unchanged.",
+    does:"Run it. Before reading the result, check the run matched the design: code, data, statistics.",
+    outputs:"A result, and the check on the run.",
+    stores:"The run’s result.",
+    why:"The check comes before the result is read, so a welcome result gets the same scrutiny as an unwelcome one. The explanation marks this ordering as inference.",
+    src:"Platt: carry out the experiment so as to get a clean result."},
+  g7: {kind:"gate", cx:690,cy:448,w:130,h:78, tt:["Is the result","clean?"], tag:"Gate", name:"Is the result clean?", when:"during",
+    needs:"The run’s check, and the auxiliaries declared at step 6.",
+    does:"Ask whether the reading is confounded by apparatus, controls or chance. No: back to step 6, with no exclusion recorded.",
+    outputs:"Yes: go to step 8. No: fix the run or controls and go back to step 6.",
+    stores:"On No, a rescue log entry with its cause.",
+    why:"A failure that may be the apparatus excludes nothing. Failed runs skip step 8, because most of what they show is about the setup.",
+    src:"Platt. Quine–Duhem, from the synthesis. Lakatos on repeated rescue.",
+    popper:"Never rescue a refuted hypothesis ad hoc."},
+  s8: {kind:"step", x:480,y:420,w:120,h:56, tt:["8. Analyze beyond","the hypotheses"], tag:"Step 8", name:"Analyze beyond the hypotheses", when:"after",
+    needs:"The clean result.",
+    does:"Run the same checks every time, whatever the hypothesis: errors by class and group, worst cases. Log what nobody predicted as a finding.",
+    outputs:"Findings, or a stated none. If a finding shows a gap in knowledge, go back to know the field.",
+    stores:"Each finding, with its size and run, status open.",
+    why:"The hypotheses decide what an experiment tests, but results hold more than that. The same checks every time mean noticing does not depend on luck.",
+    src:"Not in the sources. Closest is Fudge’s “sensitivity” at Observe. Marked as inference."},
+  s9: {kind:"step", x:330,y:420,w:120,h:56, tt:["9. Record","the results"], tag:"Step 9", name:"Record the results", when:"after",
+    needs:"The result, the outcome table from step 6, and the findings from step 8.",
+    does:"Write excluded, surviving, undecided, which run decided, and how severe: would the test have failed the hypothesis had it been false?",
+    outputs:"The record the next gate decides on.",
+    stores:"All of it, to the tree, including the findings, even if none.",
+    why:"An empty findings entry shows the analysis was done; a missing one does not. Any conclusion that is not an exclusion is insecure.",
+    src:"Platt on exclusions. Popper on severity, Mayo for the definition.",
+    popper:"Surviving a severe test corroborates, it never proves."},
+  g8: {kind:"gate", cx:245,cy:448,w:120,h:84, tt:["What","survives?"], tag:"Gate", name:"What survives?", when:"after",
+    needs:"The record from step 9.",
+    does:"Sort the cycle into one of four outcomes: one survivor, several each partly right, several rivals or undecided, or none.",
+    outputs:"One of the four grey boxes.",
+    stores:"Nothing new. The record already holds the facts.",
+    why:"The hypotheses alone decide here. Findings take no part.",
+    src:"The branching rule is assembled by the synthesis from the sources. Marked as inference."},
+  oOne: {kind:"out", x:165,y:530,w:135,h:62, tt:["One: best of this","family, not proven"], tag:"Outcome", name:"One survivor", when:"after",
+    needs:"Exactly one hypothesis left standing.",
+    does:"Treat it as the best of the answers anyone thought of. It must pass its own risky test before it counts.",
+    outputs:"Goes to step 10, where that test happens.",
+    stores:"The hypothesis stays live. “None of the above” stays live too.",
+    why:"Rivals failing does not prove the survivor. The flow enforces that by sending it to a test.",
+    src:"Platt says recheck. Popper says a survival is worth the severity of the test.",
+    popper:"Surviving a severe test corroborates, it never proves."},
+  oSev: {kind:"out", x:310,y:530,w:135,h:62, tt:["Several, each","partly right"], tag:"Outcome", name:"Several, each partly right", when:"after",
+    needs:"Hypotheses that are not rivals: each holds a part.",
+    does:"Measure each contribution.",
+    outputs:"A table of weights, then step 10.",
+    stores:"The weights, with the runs behind them.",
+    why:"For ML this is the normal case: ablations show partial contributions, not kills.",
+    src:"Chamberlin’s Great Lakes case. The sources give this no logic of its own; the example’s procedure is its own addition."},
+  oRiv: {kind:"out", x:455,y:530,w:135,h:62, tt:["Several rivals,","or undecided"], tag:"Outcome", name:"Several rivals, or undecided", when:"after",
+    needs:"A clean but inconclusive result: the rivals are all still alive.",
+    does:"Plan a new crucial experiment, with more power, or sub-hypotheses.",
+    outputs:"The red edge back to step 4.",
+    stores:"The undecided status, already in the record.",
+    why:"This is Platt’s recycle step. Neither example reaches it, so it never lights up in the walkthrough.",
+    src:"Platt."},
+  oNone: {kind:"out", x:600,y:530,w:135,h:62, tt:["None: the family","was incomplete"], tag:"Outcome", name:"None: the family was incomplete", when:"after",
+    needs:"Every hypothesis excluded.",
+    does:"Add new hypotheses, using the new facts.",
+    outputs:"The red edge back to step 4. The question stays in place.",
+    stores:"The exclusions stay. The new facts carry over.",
+    why:"“None of the above” has come true. That is a result. It tells you the family was too small.",
+    src:"Railsback."},
+  s10: {kind:"step", x:15,y:530,w:135,h:66, tt:["10. Use what","was learned"], tag:"Step 10", name:"Use what was learned", when:"after",
+    needs:"A survivor, or measured weights.",
+    does:"Name the change the knowledge justifies. If it is not yet measured, predict it and run it through steps 5 to 9. If it is measured, store what holds.",
+    outputs:"A measured change, then the objective gate.",
+    stores:"Project knowledge: what holds, the runs behind it, its conditions.",
+    why:"A use is a new prediction, and it can fail. A survivor can lose its status here. Knowledge that changes nothing is easily lost.",
+    src:"None of the sources has this step. Marked as inference."},
+  g9: {kind:"gate", cx:85,cy:448,w:130,h:86, tt:["Objective met,","budget spent,","or wrong?"], tag:"Gate", name:"Objective met, budget spent, or objective wrong?", when:"after",
+    needs:"The stop criterion and budget from step 0, and what the cycle showed.",
+    does:"Ask whether to stop. There are three reasons: success, no budget, or a sign the objective itself is wrong.",
+    outputs:"Yes: Stop. No: back to step 3.",
+    stores:"Budget used so far.",
+    why:"It comes after step 10, because the objective can only be met by a measured change.",
+    src:"Platt has no stop rule. The third reason is marked as inference."},
+  stop: {kind:"stop", x:20,y:270,w:130,h:100, tt:["Stop: report","exclusions,","survivors, findings"], tag:"Stop", name:"Stop and report", when:"after",
+    needs:"The whole tree.",
+    does:"Report exclusions, survivors, the tests they passed, what would still refute them, and every finding with its status. Every claim names its run; interpretation is marked as such.",
+    outputs:"The report. A new or revised objective can start at step 0 by the purple edge.",
+    stores:"Everything stays. A finding the objective never needed leaves as deferred, with its reason.",
+    why:"Marking interpretation matters because a measurement can be checked against its run, while an explanation of it can go further than the run shows.",
+    src:"Popper on tentative survivors. The rest is inference.",
+    popper:"A survivor is held tentatively, and the report says what would end its tenure."},
+  tree: {kind:"tree", x:195,y:205,w:350,h:195, tag:"Store", name:"Logical tree + notebook", when:"all",
+    needs:"Writes from step 9, and from the steps that log findings and project knowledge.",
+    does:"Hold the accumulated knowledge. A node is a question with its live hypotheses. An edge is a crucial experiment, and the outcome picks the branch.",
+    outputs:"Read at step 2 (what is known) and at steps 3 and 4 (findings).",
+    stores:"Excluded hypotheses, with their runs. Untested ones, kept visible. Findings, with status and reason. Project knowledge.",
+    why:"It outlives every cycle. An exclusion holds under its conditions: if they change, it is reopened as a finding.",
+    src:"Platt’s notebook and tree. In a repository, a set of markdown files (inference from the synthesis)."},
+};
+const KNOW = ["s1","s2","ans","ref"];
+
+/* Edges: path, colour family, optional label */
+const EDGES = [
+  ["s0>know","M150 71H175","flow"],
+  ["s1>s2","M247 98V120","flow"],["s2>ans","M307 143H325","flow"],["ans>ref","M384 120V98","flow"],["ref>s1","M325 75H307","flow"],
+  ["know>s3","M455 85H490","flow"],["s3>g3","M620 85H655","flow"],
+  ["g3>know","M720 40V12H315V28","back",{x:580,y:26,t:"No: not yet a good question",a:"middle"}],
+  ["g3>s4","M720 130V150","flow",{x:728,y:145,t:"Yes"}],
+  ["s4>s5","M820 228V240","flow"],["s5>s6","M820 318V330","flow"],["s6>s7","M890 386V420","flow"],
+  ["s7>g7","M800 448H755","flow"],
+  ["g7>s6","M690 409V386","back",{x:698,y:405,t:"No: fix, log the rescue"}],
+  ["g7>s8","M625 448H600","flow",{x:603,y:441,t:"Yes"}],
+  ["s8>s9","M480 448H450","flow"],["s9>g8","M330 448H305","flow"],
+  ["s8>know","M595 420V408H628V194H440V178","back",{x:622,y:300,t:"finding shows",a:"end"},{x:622,y:313,t:"a gap in",a:"end"},{x:622,y:326,t:"knowledge",a:"end"}],
+  ["g8>oOne","M245 490V510H232V530","flow"],["g8>oSev","M245 490V510H377V530","flow"],["g8>oRiv","M245 490V510H522V530","flow"],["g8>oNone","M245 490V510H667V530","flow"],
+  ["oRiv>s4","M522 592V612H1003V189H980","recycle",{x:800,y:607,t:"Recycle: new hypotheses",a:"middle"}],
+  ["oNone>s4","M667 592V612H1003V189H980","recycle"],
+  ["oOne>s10","M165 561H150","flow"],["oSev>s10","M377 592V604H110V596","flow"],
+  ["s10>s5","M50 596V632H1017V279H980","recycle",{x:500,y:627,t:"Not yet measured: a new prediction and experiment",a:"middle"}],
+  ["s10>g9","M85 530V491","flow",{x:93,y:515,t:"Measured"}],
+  ["g9>stop","M85 405V370","flow",{x:93,y:392,t:"Yes"}],
+  ["g9>s3","M150 448H172V186H555V120","back",{x:178,y:198,t:"No: next sub-question"}],
+  ["stop>s0","M55 270V102","newobj",{x:62,y:178,t:"New or revised"},{x:62,y:191,t:"objective"}],
+  ["tree>know","M340 205V178","read",{x:346,y:200,t:"read at step 2"}],
+  ["tree>s3","M530 205V120","read",{x:524,y:150,t:"read: findings",a:"end"}],
+  ["s9>tree","M390 420V400","read",{x:396,y:414,t:"write"}],
+];
+
+/* ---------- Helpers that describe what a moment writes ---------- */
+const obj = (text, stop, runs, subs, days) => ({op:"obj", text, stop, runs, subs, days});
+const used = (runs, subs, days) => ({op:"used", runs, subs, days});
+const node = (id, q, parent, note) => ({op:"node", id, q, parent, note});
+const hyp = (id, n, text, status) => ({op:"hyp", id, n, text, status: status || "live"});
+const none = (n) => ({op:"hyp", id:n+"-none", n, text:"None of the above", status:"placeholder"});
+const pred = (id, text) => ({op:"pred", id, text});
+const set = (id, status, by, say) => ({op:"set", id, status, by, say});
+const run = (id, n, text) => ({op:"run", id, n, text});
+const res = (id, text) => ({op:"res", id, text});
+const find = (id, text, status, say) => ({op:"find", id, text, status, say});
+const rescue = (text) => ({op:"rescue", text});
+const hyg = (text) => ({op:"hyg", text});
+const know = (id, text, by) => ({op:"know", id, text, by});
+
+/* ---------- Example 1 ---------- */
+const EX1 = {cycles:["Cycle 1","Cycle 2","Cycle 3, new objective"], trace:[
+ {c:0,n:"s0",t:"Objective: a local evaluation protocol whose estimate predicts the public leaderboard score. Root question: why doesn’t it? Stop when two submissions in a row land within 0.03. Budget: 8 training runs, 3 submissions, 2 weeks.",
+  w:[obj("A local evaluation protocol whose estimate predicts the public leaderboard score.","Two consecutive submissions within 0.03 of the local estimate, under one fixed protocol.",8,3,14)]},
+ {c:0,n:"s1",t:"Three questions, written before looking. What causes a gap between cross-validation and leaderboard? How is the public test set drawn? How much do seeds vary, so that a gap can be told from noise?"},
+ {c:0,n:"s2",t:"Local estimate 0.69, first public score 0.42 (real). A baseline pilot gives 0.69 ± 0.01, so the gap is far above seed noise. Three of sixteen external datasets changed since download (real)."},
+ {c:0,n:"ans",t:"The seed question is answered: the gap is real. The test set’s author mix stays unknown. A new question appears: do the submission notebooks train on the same data as the local runs? A puzzle is on the table, so the loop ends."},
+ {c:0,n:"s3",t:"First attempt: “What is the public score of the baseline with better features?”"},
+ {c:0,n:"g3",a:"No, back to the loop.",t:"That is a what question. Submitting answers it, and it does not explain the gap."},
+ {c:0,n:"s3",hops:["know","s3"],t:"Second attempt: “Why does a local estimate of 0.69 become a public score of 0.42 for the same model?”"},
+ {c:0,n:"g3",a:"Yes.",t:"A why question, it serves the objective directly, and alternatives can be stated.",
+  w:[node("N1","Why does a local estimate of 0.69 become a public score of 0.42?")]},
+ {c:0,n:"s4",t:"Four explanations and a placeholder, written before any new run. “The public set is noisy” is pruned: any score fits it, so it forbids nothing. “The model overfits” is too vague to forbid anything.",
+  w:[hyp("H001","N1","Prompt leakage: same prompts in train and validation folds"),hyp("H002","N1","Training-data drift: notebooks use later dataset versions"),hyp("H003","N1","Class prior shift in the public test set"),hyp("H004","N1","Several at once, each part of the gap"),none("N1")]},
+ {c:0,n:"s5",t:"Each prediction states a size. H001 expects a drop of at least 0.15 under a split grouped by prompt id, when nothing on the old protocol moves by more than 0.01. The placeholder predicts nothing.",
+  w:[pred("H001","Grouped split drops the estimate ≥ 0.15"),pred("H002","Pinned versions change the estimate ≥ 0.05"),pred("H003","Majority-class probe ≥ 0.10 from training frequency"),pred("H004","Each move ≥ 0.03, none ≥ 0.20")]},
+ {c:0,n:"s6",t:"Three tests, and a table saying what each outcome excludes. Declared auxiliaries: the prompt column may be wrong, the local data may not match the manifest, the metric may not be accuracy. Nothing else may be blamed afterwards.",
+  w:[run("E001","N1","Grouped five-fold split by prompt id, three seeds"),run("E002","N1","Verify data, rerun on pinned versions, three seeds"),run("P001","N1","One submission predicting the majority class")]},
+ {c:0,n:"s7",fail:1,t:"E002 goes first, because it is cheapest. The data check fails on three datasets. The local files are not the pinned versions, so the run stops before training."},
+ {c:0,n:"g7",a:"No, not clean.",fail:1,t:"The test cannot be interpreted until the data matches the manifest. No exclusion is recorded."},
+ {c:0,n:"s6",fail:1,t:"The stale local copy was declared at step 6, so it may be blamed. Fetch the pinned versions, then the check passes.",
+  w:[rescue("Entry 1: E002 aborted. Blamed: stale local copy, declared at step 6. Fix: fetch pinned versions. No exclusion recorded.")]},
+ {c:0,n:"s7",t:"E002: 0.68 ± 0.01, a change of 0.01. E001: 0.46 ± 0.02, a drop of 0.23. P001 scores 0.19 against a training frequency of 0.21.",
+  w:[res("E002","0.68 ± 0.01, change 0.01"),res("E001","0.46 ± 0.02, drop 0.23"),res("P001","0.19 public vs 0.21 training frequency")]},
+ {c:0,n:"g7",a:"Yes, clean.",t:"Clean on all three. P001 is clean on the metric but its noise is unknown, so its verdict is provisional until cycle 2 measures it."},
+ {c:0,n:"s8",t:"The standing checks run on E001. No hypothesis says anything about them. They show something nobody predicted: 58% of errors confuse a model with another of the same family. It describes this data and supports nothing yet.",
+  w:[find("F001","58% of errors confuse a model with a sibling in its family. About 15% would be expected if spread evenly. Source: E001.","open","seen at step 8")]},
+ {c:0,n:"s9",t:"E002 excludes H002 (severity high). E001 ends H003 as a sole cause and breaks H004’s “none ≥ 0.20” clause (high). P001 excludes H003, provisionally (medium). Drift did not cause the gap, but it is a real defect, so it is logged apart.",
+  w:[set("H002","excluded","E002"),set("H003","excluded","P001, provisional"),set("H004","excluded","E001"),hyg("Dataset drift: not the cause of the gap, but a defect in the pipeline. Found by E002.")]},
+ {c:0,n:"g8",a:"One: H001.",t:"H004 fell to E001’s size: one drop of 0.23, which the combination said could not happen. The placeholder stays live. A retest is written now: a local estimate within 0.03 of the public score."},
+ {c:0,n:"oOne",t:"Best of this family, not proven. E001’s predicted drop was one risky test. The retest on new models is the harder one, and it is still owed.",w:[set("H001","corroborated","E001")]},
+ {c:0,n:"s10",t:"Apply: every later comparison uses the grouped split. Measure: 0.46 misses the known 0.42 by 0.04, outside the allowed 0.03. So H001 explains most of the gap, not all. Store: nothing yet. One corroboration with a retest pending is not project knowledge."},
+ {c:0,n:"g9",a:"No, back to step 3.",t:"No submission has met the criterion yet. Budget used so far: 3 of 8 runs, 1 of 3 submissions, 4 of 14 days.",w:[used(3,1,4)]},
+
+ {c:1,n:"s3",t:"Open findings first. F001 is deferred: it concerns what the model gets wrong, and this objective concerns whether the estimate predicts the score. Then a first attempt: “Which feature carries the prompt signal?”",
+  w:[find("F001",null,"deferred","deferred at step 3: this objective does not need it")]},
+ {c:1,n:"g3",a:"No, back to the loop.",t:"A how question, but it explains the model, while the objective asks about the estimate. The grouped split removes the leakage whichever feature carries it."},
+ {c:1,n:"s1",t:"The loop reads the tree first, so it starts from what cycle 1 excluded and left weak. New questions: how large is the noise on the 0.04? Do different prompt ids always mean different prompts? Which rows make up the estimate?"},
+ {c:1,n:"s2",t:"The public set has 2,000 rows. Many prompts are near-copies with different ids: 38% of validation rows have a similar prompt in the training folds. 60% of rows come from external datasets."},
+ {c:1,n:"ans",t:"The prompt-id question now has a puzzle attached: grouping by id may not have finished the job H001 started. The loop ends."},
+ {c:1,n:"s3",t:"Second attempt: “Why does the grouped estimate still sit 0.04 above the public score?”"},
+ {c:1,n:"g3",a:"Yes.",t:"Closing this gap is the objective. The rejected feature question stays in the tree as an open branch, visibly untested.",
+  w:[node("N2","Why does the grouped estimate still sit 0.04 above the public score?","N1","Child of N1, on the H001 branch. Open branch: which feature carries the prompt signal (untested).")]},
+ {c:1,n:"s4",t:"A new family. H005 is cycle 1’s pruned “the public set is noisy”, back now because it has a size and can fail. H006 refines H001 with a finer unit. “The test set is just harder” is pruned.",
+  w:[hyp("H005","N2","Noise: the 0.04 is only sampling noise"),hyp("H006","N2","Prompt families: near-copies still cross folds"),hyp("H007","N2","Validation mix: external rows are easier"),hyp("H008","N2","Generator shift in the public texts"),hyp("H009","N2","H006 and H007 each carry part"),none("N2")]},
+ {c:1,n:"s5",t:"Predictions with sizes. H008 stays untested on purpose: its test costs a submission, and both remaining submissions are committed to the stop criterion. It stays visible, so nobody reads it as excluded.",
+  w:[pred("H005","Combined standard error ≥ 0.02"),pred("H006","Family grouping drops the estimate ≥ 0.02"),pred("H007","Own rows score ≥ 0.02 below the pool"),pred("H008","Train-vs-public classifier AUC ≥ 0.70"),pred("H009","Both moves ≥ 0.01"),set("H008","untested",null,"H008 kept visible as untested")]},
+ {c:1,n:"s6",t:"Cycle 1’s three-seed rule cannot resolve this, so a new rule is fixed first: ten seeds. The cosine threshold of 0.6 is fixed too and will not be swept. The retest is frozen as well: two new models, estimates written down before each submission.",
+  w:[run("P002","N2","Score E003’s control predictions by data source"),run("P003","N2","Binomial standard error, plus a prompt bootstrap"),run("E003","N2","Id-grouped vs family-grouped split, ten seeds"),run("E004","N2","Retest: character n-gram model"),run("E005","N2","Retest: small transformer, the likeliest to fail")]},
+ {c:1,n:"s7",fail:1,t:"E003 control 0.46, family arm 0.43: a drop of 0.03, or 3.4 standard errors. P003 gives a combined standard error of 0.016. P002 finds own rows 0.005 below the pool. Then E004’s notebook attaches the latest version of a dataset, and the manifest check stops it before a submission is spent.",
+  w:[res("E003","0.43 ± 0.02 family vs 0.46 ± 0.02 id-grouped"),res("P003","Combined standard error 0.016; the 0.04 is 2.5 standard errors"),res("P002","Own rows 0.455, external 0.465")]},
+ {c:1,n:"g7",a:"No, not clean for E004.",fail:1,t:"The other runs are clean. E004 cannot be read, so it records no exclusion."},
+ {c:1,n:"s6",fail:1,t:"The attached version was a declared auxiliary. Attach the pinned one. This check exists because of cycle 1’s hygiene finding, so what cycle 1 kept has just saved a submission.",
+  w:[rescue("Entry 2: E004 aborted. Blamed: attached dataset version, declared at step 6. Fix: attach the pinned version. No hypothesis has been saved twice.")]},
+ {c:1,n:"s7",t:"Estimates are written down, then submitted. E004: estimate 0.47, public 0.45. E005: estimate 0.52, public 0.50. Both differ by 0.02.",
+  w:[res("E004","Estimate 0.47, public 0.45"),res("E005","Estimate 0.52, public 0.50")]},
+ {c:1,n:"g7",a:"Yes, clean.",t:"The baseline’s difference of 0.01 does not count toward the stop criterion, because the split was chosen with that score in view."},
+ {c:1,n:"s8",t:"The same checks again. F001 repeats at 56% on a different model under a different split, so it no longer depends on one run. And something new: all three estimates sit above their public scores.",
+  w:[find("F001",null,"deferred","repeated at 56% on E005"),find("F002","All three estimates sit above their public scores: 0.01, 0.02, 0.02.","open","seen at step 8")]},
+ {c:1,n:"s9",t:"P003 excludes H005. P002 excludes H007 and H009. E003 corroborates H006. E004 and E005 corroborate H001 and H006. Severity is medium: a protocol off by 0.04 would still pass both submissions between 8% and 29% of the time.",
+  w:[set("H003","excluded","P001, P003"),set("H005","excluded","P003"),set("H007","excluded","P002"),set("H009","excluded","P002"),set("H006","corroborated","E003, E004, E005"),set("H001","corroborated","E001, E004, E005")]},
+ {c:1,n:"g8",a:"One tested survivor: H006, with its parent H001.",t:"H008 is still live, but nothing has been run against it, so it is not a measured rival. The placeholder stays live."},
+ {c:1,n:"oOne",t:"Best of this family, not proven. E003 and the two retests are the risky tests it had to pass. The debt from cycle 1 is paid."},
+ {c:1,n:"s10",t:"Apply: the family-grouped split with checked data becomes the protocol. Measure: E004 and E005 already did. Store: the first project knowledge appears. Also, H002, H003 and H004 were excluded under a protocol now replaced, so that is logged as a question.",
+  w:[know("k1","Near-copied prompts leak across folds.","E001, E003"),know("k2","This protocol predicts the public score within 0.03. Caution: F002.","E004, E005"),find("F004","H002, H003 and H004 were excluded under the old stratified protocol. Do they still stand?","open","reopened at step 10: conditions changed")]},
+ {c:1,n:"g9",a:"Yes: objective met and budget spent.",t:"Two submissions in a row within 0.03 under one fixed protocol. Budget: 7 of 8 runs, 3 of 3 submissions, 11 of 14 days.",w:[used(7,3,11)]},
+ {c:1,n:"stop",t:"The report names a run for every claim. It marks one line as interpretation: that near-copied prompts are the mechanism is inferred, since E003 shows the split matters, not exactly why. It also says what would still refute the protocol. F001 leaves as deferred, with its reason."},
+
+ {c:2,n:"s0",t:"A new objective, by the purple edge. F001 was deferred because the last objective did not need it. It can now be taken up: raise the public score by reducing errors within model families. Budget: 6 runs, 2 submissions, 2 weeks.",
+  w:[obj("Raise the public score by reducing the errors made within model families.","A public score at least 0.03 above 0.50, with the local estimate within 0.03 of it.",6,2,14)]},
+ {c:2,n:"s2",t:"The loop starts from project knowledge, so the protocol, the pinned data and every exclusion carry over and are not re-derived. E005 sizes the problem: the family is right on 0.79 of rows, and within those the sibling is right 0.66 of the time."},
+ {c:2,n:"s3",t:"Open findings first. F001 is promoted: it repeated, and this objective needs it. F002 is deferred. F004 is dropped, with reasons: H003 and H004 stand, and rechecking H002 would change no decision. The question: “Why are errors concentrated within model families?”",
+  w:[find("F001",null,"promoted","promoted at step 3: it repeats, and this objective needs it"),find("F002",null,"deferred","deferred at step 3: this objective does not depend on it"),find("F004",null,"dropped","dropped at step 3: H003 and H004 stand; H002 would change no decision")]},
+ {c:2,n:"g3",a:"Yes.",t:"A why question that serves the objective. F001 gave the question. It is not evidence for any answer.",
+  w:[node("N3","Why are errors concentrated within model families?",null,"New objective. The question came from F001.")]},
+ {c:2,n:"s4",t:"Four rivals and a placeholder. “Family errors are just harder” is pruned: it forbids nothing, and H010 is its testable form.",
+  w:[hyp("H010","N3","A ceiling: siblings write too much alike"),hyp("H011","N3","Too few examples per sibling"),hyp("H012","N3","Wrong design: a flat classifier spends capacity on families"),hyp("H013","N3","Noisy labels between siblings"),none("N3")]},
+ {c:2,n:"s5",t:"Each states a size on within-family accuracy, or on the share of mislabelled rows.",
+  w:[pred("H010","No dedicated classifier gains ≥ 0.02"),pred("H011","Doubling the data gains ≥ 0.05"),pred("H012","A dedicated classifier gains ≥ 0.05"),pred("H013","≥ 10% of 200 audited rows mislabelled")]},
+ {c:2,n:"s6",t:"Three tests, with E005 as the control, on the same folds and metric. The family map is written down before the run and not changed afterwards.",
+  w:[run("P004","N3","Audit 200 within-family errors by hand"),run("E006","N3","Flat transformer on half the rows"),run("E007","N3","Dedicated within-family classifiers")]},
+ {c:2,n:"s7",t:"P004: 4 of 200 rows mislabelled. E006: 0.64 on half the data against 0.66. E007: 0.73 against 0.66, a gain of 0.07.",
+  w:[res("P004","2% of 200 mislabelled"),res("E006","0.64 vs 0.66, gain 0.02"),res("E007","0.73 vs 0.66, gain 0.07")]},
+ {c:2,n:"g7",a:"Yes, clean.",t:"All three are clean. No rescue this time."},
+ {c:2,n:"s8",t:"The standing checks show one more surprise: the errors E007 still makes fall mostly in the two newest families.",
+  w:[find("F003","61% of remaining within-family errors fall in the two newest families. Source: E007.","open","seen at step 8")]},
+ {c:2,n:"s9",t:"P004 excludes H013. E006 excludes H011. E007 excludes H010 and corroborates H012, with high severity: with no design effect, the gain would have stayed below 0.02.",
+  w:[set("H013","excluded","P004"),set("H011","excluded","E006"),set("H010","excluded","E007"),set("H012","corroborated","E007"),find("F001",null,"promoted","tested: linked to H010 to H013")]},
+ {c:2,n:"g8",a:"One: H012.",t:"Corroborated, not proven. The next step is its hardest test so far, because it moves from a local comparison to the public score."},
+ {c:2,n:"oOne",t:"It must pass its own risky test before it counts."},
+ {c:2,n:"s10",t:"Apply: replace the flat classifier with two stages. Predict the family, then use that family’s own classifier. This is not yet measured, so it takes the red edge. Written before the run: an estimate near 0.58, and a public score within 0.03 of whatever the estimate turns out to be."},
+ {c:2,n:"s10",hops:["s5","s6","s7","g7","s8","s9","g8","oOne","s10"],t:"E008 passes through steps 5 to 9 and comes back measured. Estimate 0.58, public 0.56: a difference of 0.02, and 0.06 above the transformer. So F001 has been seen, tested and used. It closes, and what holds is stored with its conditions.",
+  w:[run("E008","N3","Two-stage model, written before the run"),res("E008","Estimate 0.58, public 0.56"),set("H012","corroborated","E007, E008"),find("F001",null,"closed","used at step 10: closed, stored as knowledge"),
+     know("k1","Grouping must be by prompt family, not prompt id. Near-copied prompts leak across folds. Tested on the baseline, at cosine 0.6.","E001, E003"),
+     know("k2","The family-grouped protocol predicted the public score within 0.03 on three new models. It may run about 0.02 high, cause unknown. Tested in this competition only.","E004, E005, E008; F002"),
+     know("k3","Dataset drift did not cause the gap, but it is a real defect, and the manifest check catches it. Tested under the stratified split.","E002, E004"),
+     know("k4","Sibling errors respond to model design, not to more data or cleaner labels. Tested on this competition’s families, from one transformer.","P004, E006, E007, E008"),
+     know("k5","Not yet known: whether public texts differ from training texts, and why the newest families remain hardest.","H008, F003")]},
+ {c:2,n:"g9",a:"Yes: objective met.",t:"0.56 is at least 0.03 above 0.50, and the estimate is within 0.03. Budget: 3 of 6 runs, 1 of 2 submissions, 6 of 14 days.",w:[used(3,1,6)]},
+ {c:2,n:"stop",t:"The final report. Interpretation is marked: that a flat model spends its capacity on families is the explanation H012 offers, while E007 and E008 show the gain, not the reason. F002 is deferred and F003 stays open, ready for whoever reads the project knowledge next."},
+]};
+
+/* ---------- Example 2 ---------- */
+const EX2 = {cycles:["Round 1","Round 2"], trace:[
+ {c:0,n:"s0",t:"A paper reports a recipe with three parts: a curriculum (A), an auxiliary loss (B) and a long schedule (C). It gains 6.0 points and credits the curriculum, without ablating anything. Objective: an accounting of the gain by component. Budget: 40 runs, 3 weeks.",
+  w:[obj("An accounting of the recipe’s gain by component, so only the parts that pay for their compute are adopted.","Every contribution measured with a three-seed interval, summing to the reproduced gain within the noise band.",40,null,21)]},
+ {c:0,n:"s1",t:"Does the paper ablate its components? What is the seed variance here? Does the recipe reproduce locally?"},
+ {c:0,n:"s2",t:"The paper reports no ablation. Pilot: baseline 61.1 ± 0.3, recipe 67.1 ± 0.3, so the gain of 6.0 reproduces. One thing noted: the baseline’s learning rate and warmup were inherited, while the recipe’s were tuned."},
+ {c:0,n:"ans",t:"Seed variance is answered: differences of 0.6 can be resolved. The recipe reproduces. The puzzle remains: the paper names one cause for a gain it never decomposed."},
+ {c:0,n:"s3",t:"First attempt: “How much does each component add?”"},
+ {c:0,n:"g3",a:"No, back to the loop.",t:"A what question dressed as a how question. It is a measurement with no alternatives to exclude."},
+ {c:0,n:"s3",hops:["know","s3"],t:"Second attempt: “Why does the recipe gain 6.0 points: which components carry the gain, and do they act alone?”"},
+ {c:0,n:"g3",a:"Yes.",t:"Alternatives can be stated, and the answer decides what to adopt.",w:[node("N1","Why does the recipe gain 6.0 points: which components carry it, and do they act alone?")]},
+ {c:0,n:"s4",t:"Three bold sole causes, one additive combination, and the placeholder. “The recipe is better regularised” is pruned: it forbids nothing.",
+  w:[hyp("H001","N1","The curriculum alone"),hyp("H002","N1","The auxiliary loss alone"),hyp("H003","N1","The long schedule alone"),hyp("H004","N1","All three, adding up"),none("N1")]},
+ {c:0,n:"s5",t:"A sole cause must cost at least 4.8 when removed, with the others costing under 0.6. An additive mix must have removals summing to 6.0 ± 0.6. Any interaction would break that sum.",
+  w:[pred("H001","Own removal ≥ 4.8, others < 0.6"),pred("H002","Own removal ≥ 4.8, others < 0.6"),pred("H003","Own removal ≥ 4.8, others < 0.6"),pred("H004","Each ≥ 0.6, sum 6.0 ± 0.6")]},
+ {c:0,n:"s6",t:"One leave-one-out design, three seeds per arm. Declared auxiliaries: each switch must do what it says, and a diverged seed is rerun with a reserve seed. The baseline’s different settings are noted as a known limit of the design.",
+  w:[run("E001","N1","Leave-one-out: −A, −B, −C, three seeds")]},
+ {c:0,n:"s7",t:"Removing A costs 3.5. Removing B costs 1.1. Removing C costs 2.5.",w:[res("E001","63.6 / 66.0 / 64.6 vs recipe 67.1")]},
+ {c:0,n:"g7",a:"Yes, clean.",t:"Assertions pass, no seed diverges, and the ranges do not overlap with the recipe arm."},
+ {c:0,n:"s8",t:"The standing checks split errors by difficulty, which no hypothesis mentions. Removing the long schedule costs 5.0 on the hardest third and 0.4 on the easiest.",
+  w:[find("F001","Removing the long schedule costs 5.0 on the hardest third, 2.1 on the middle, 0.4 on the easiest. Source: E001.","open","seen at step 8")]},
+ {c:0,n:"s9",t:"Each removal costs less than 4.8, so all three sole causes are excluded. The drops sum to 7.1 against a band of 6.0 ± 0.6, so the additive mix goes too. All with high severity.",
+  w:[set("H001","excluded","E001"),set("H002","excluded","E001"),set("H003","excluded","E001"),set("H004","excluded","E001")]},
+ {c:0,n:"g8",a:"None.",t:"Every hypothesis in the family is excluded."},
+ {c:0,n:"oNone",t:"The placeholder has come true. And the failure is informative: the drops over-account by 1.1, so some pair of components shares part of the gain. The baseline’s settings may also own a part. The question stands.",
+  w:[set("N1-none","true","E001","Round 1 placeholder came true")]},
+
+ {c:1,n:"s4",t:"The red edge lands here, skipping step 3, so F001 is decided here. It is promoted: it gives H005 its grounds, but it is not evidence for it. These hypotheses are not rivals: any subset can hold at once. “The components interact somehow” is pruned.",
+  w:[find("F001",null,"promoted","promoted at step 4: it bears on the widened family"),hyp("H005","N1","Curriculum × schedule: curriculum pays only with a long schedule"),hyp("H006","N1","Hyperparameter mismatch: the paper’s baseline is undertuned"),hyp("H007","N1","Loss × schedule: the loss pays only with a long schedule"),{op:"hyp",id:"N1-none2",n:"N1",text:"None of the above (fresh)",status:"placeholder"}]},
+ {c:1,n:"s5",t:"With no interaction, a component’s two effects would agree within 0.6. So a difference of at least 0.8 is risky. H005 also predicts where the gain falls: mostly in the hardest third.",
+  w:[pred("H005","Long-minus-short curriculum effect ≥ 0.8; hard third ≥ 2 × easy third"),pred("H006","No-component arm beats the paper’s baseline ≥ 0.6"),pred("H007","Long-minus-short loss effect ≥ 0.8")]},
+ {c:1,n:"s6",t:"Complete the 2 × 2 × 2 factorial. Because the hypotheses are complementary, each outcome excludes only the hypothesis whose own prediction failed.",
+  w:[run("E002","N1","Complete the factorial: A, B and C alone"),run("E003","N1","Origin cell: no component, recipe settings"),run("P001","N1","Re-score saved checkpoints by difficulty third")]},
+ {c:1,n:"s7",fail:1,t:"E003 comes first: 61.9 against the paper’s 61.1, a difference of 0.8. Then in E002, arm C with seed 12 diverges in the second epoch.",w:[res("E003","61.9 ± 0.3 vs paper baseline 61.1 ± 0.3")]},
+ {c:1,n:"g7",a:"No, not clean for that seed.",fail:1,t:"A diverged seed says nothing about the hypothesis."},
+ {c:1,n:"s6",fail:1,t:"A diverged seed was declared at step 6. Rerun with reserve seed 14.",w:[rescue("Entry 1: arm C, seed 12 diverged. Blamed: diverged seed, declared at step 6. Fix: reserve seed 14. No exclusion recorded.")]},
+ {c:1,n:"s7",t:"The full factorial is in. The curriculum’s effect is 3.5 under the long schedule and 1.5 under the short one, a difference of 2.0. The loss’s effect barely moves, a difference of −0.1. P001: the gain under the long schedule is 5.2 times larger on hard items.",
+  w:[res("E002","Curriculum effect 3.5 long vs 1.5 short; loss 1.1 vs 1.2"),res("P001","Curriculum gain by third, long schedule: 1.2 / 3.1 / 6.2")]},
+ {c:1,n:"g7",a:"Yes, clean.",t:"Seed 14 trains normally, and arm C has its three seeds."},
+ {c:1,n:"s8",t:"The same checks on the full factorial. Something else appears that no hypothesis mentions: arms with the loss gain more on long prompts.",
+  w:[find("F002","Arms with the auxiliary loss gain 1.9 on long prompts and 0.4 on short ones. Source: E002.","open","seen at step 8")]},
+ {c:1,n:"s9",t:"E002 excludes H007, and corroborates H005 (high). E003 corroborates H006 (medium: 0.8 is a floor, since no sweep was run). P001 corroborates H005’s mechanism (medium).",
+  w:[set("H007","excluded","E002"),set("H005","corroborated","E002, P001"),set("H006","corroborated","E003"),find("F001",null,"closed","tested by P001: closed")]},
+ {c:1,n:"g8",a:"Several, each partly right: H005 and H006.",t:"They are complementary, not rivals. An interaction and an undertuned baseline can both hold."},
+ {c:1,n:"oSev",t:"Measure each contribution. Baseline settings 0.8, curriculum 1.5, loss 1.1, schedule alone 0.6, curriculum × schedule 2.0. They sum to 6.0. The paper’s attribution is partly right: the curriculum is in 3.5 of the 6.0 points, but 2.0 of those exist only with the long schedule."},
+ {c:1,n:"s10",t:"Apply: adopt the recipe’s settings, the loss, and the curriculum together with the long schedule. Do not adopt the long schedule without the curriculum. This is not yet measured, and the weights came from another training set, so it can fail."},
+ {c:1,n:"s10",hops:["s5","s6","s7","g7","s8","s9","g8","oSev","s10"],t:"E004, on our own pipeline, written before the run: a gain of at least 4.0 over 58.0. Result: 63.2 ± 0.3, a gain of 5.2. Store what holds, with its conditions.",
+  w:[run("E004","N1","Full adoption on our own pipeline"),res("E004","63.2 ± 0.3 vs 58.0 ± 0.3"),know("k1","For this recipe, the curriculum pays mostly with a long schedule. Holds for this benchmark and model size; gain confirmed once on our own pipeline.","E002, P001, E004"),know("k2","A paper’s baseline may be undertuned, so its gain can include hyperparameters.","E003"),hyg("The paper’s comparison confounded its components with its hyperparameters. Not a cause of the gain, but a defect in how it was reported.")]},
+ {c:1,n:"g9",a:"Yes: objective met.",t:"Every named contribution is measured, and the weights sum to the reproduced gain. Budget: 31 of 40 runs launched, 17 of 21 days.",w:[used(31,null,17)]},
+ {c:1,n:"stop",t:"The report marks its interpretation: that the long schedule gives the curriculum steps to spend on hard examples is inferred. P001 shows where the gain falls, not why. F002 leaves as deferred. Across both examples, two drawn paths are still unexercised.",
+  w:[find("F002",null,"deferred","deferred at Stop: the accounting did not need it")]},
+]};
+
+const EXAMPLES = [EX1, EX2];
+
+/* ---------- State ---------- */
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let ex = EX1, pos = 0, view = null, timer = null, speed = 1, token = 0;
+const edgeEls = {}, nodeEls = {};
+
+const groupOf = (x) => KNOW.includes(x) ? "know" : x;
+function edgeKey(a, b) {
+  for (const k of [`${a}>${b}`, `${groupOf(a)}>${b}`, `${a}>${groupOf(b)}`, `${groupOf(a)}>${groupOf(b)}`]) if (edgeEls[k]) return k;
+  return null;
+}
+function pathOf(i) {
+  if (i <= 0) return [];
+  const e = ex.trace[i], stops = [ex.trace[i-1].n, ...(e.hops || [e.n])], keys = [];
+  for (let k = 1; k < stops.length; k++) { const key = edgeKey(stops[k-1], stops[k]); if (key) keys.push(key); else console.warn("No edge", stops[k-1], stops[k]); }
+  return keys;
+}
+
+/* Fold the trace up to a moment. Going backward just replays, so scrubbing is exact. */
+function fold(upto) {
+  const s = {objective:null, used:null, nodes:[], hyps:{}, runs:{}, finds:{}, rescues:[], hyg:[], know:{}, fresh:new Set(), lines:[]};
+  for (let i = 0; i <= upto; i++) {
+    for (const o of ex.trace[i].w || []) {
+      const now = i === upto; let line = null, mark = null;
+      if (o.op === "obj") { s.objective = o; s.used = null; line = "New objective, stop criterion and budget"; }
+      if (o.op === "used") { s.used = o; line = "Budget used updated"; }
+      if (o.op === "node") { s.nodes.push(o); mark = o.id; line = `Tree node ${o.id} opened`; }
+      if (o.op === "hyp") { s.hyps[o.id] = {...o, by:null, pred:null}; mark = o.id; line = o.status === "placeholder" ? `“${o.text}” added as a placeholder` : `${o.id} added, live`; }
+      if (o.op === "pred") { s.hyps[o.id].pred = o.text; mark = o.id; line = `${o.id} prediction written`; }
+      if (o.op === "set") { const h = s.hyps[o.id]; h.status = o.status; h.by = o.by; mark = o.id; line = o.say || `${o.id} ${o.status}${o.by ? ", by " + o.by : ""}`; }
+      if (o.op === "run") { s.runs[o.id] = {...o, res:null}; mark = o.id; line = `${o.id} designed`; }
+      if (o.op === "res") { s.runs[o.id].res = o.text; mark = o.id; line = `${o.id} result recorded`; }
+      if (o.op === "find") {
+        const f = s.finds[o.id] || (s.finds[o.id] = {id:o.id, text:o.text, trail:[]});
+        f.status = o.status; f.trail.push({i, status:o.status, say:o.say}); mark = o.id; line = `${o.id}: ${o.say}`;
+      }
+      if (o.op === "rescue") { s.rescues.push(o.text); mark = "rescue" + (s.rescues.length - 1); line = "Rescue log entry added"; }
+      if (o.op === "hyg") { s.hyg.push(o.text); mark = "hyg" + (s.hyg.length - 1); line = "Hygiene finding logged apart"; }
+      if (o.op === "know") { s.know[o.id] = o; mark = o.id; line = "Project knowledge: " + o.text.split(". ")[0].replace(/\.$/, ""); }
+      if (now) { if (mark) s.fresh.add(mark); if (line) s.lines.push(line); }
+    }
+  }
+  return s;
+}
+
+/* ---------- Map ---------- */
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs, parent, text) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; if (parent) parent.appendChild(e); return e; }
+function textLines(g, lines, cx, cy, cls) { const lh = 15, y0 = cy - (lines.length - 1) * lh / 2 + 4; lines.forEach((l, i) => el("text", {x:cx, y:y0 + i * lh, "text-anchor":"middle", class:cls}, g, l)); }
+function buildMap() {
+  const svg = $("map");
+  el("rect", {x:175,y:28,width:280,height:150,class:"frame solid"}, svg);
+  el("text", {x:187,y:44,class:"frame-t"}, svg, "Know the field: loop until a question is worth pursuing");
+  el("rect", {x:648,y:138,width:344,height:258,class:"frame"}, svg);
+  el("text", {x:986,y:148,"text-anchor":"end",class:"frame-t"}, svg, "discovery phase");
+  const edges = el("g", {}, svg);
+  const defs = el("defs", {}, svg);
+  for (const fam of ["flow","back","recycle","newobj","read"]) {
+    const m = el("marker", {id:"a-"+fam, viewBox:"0 0 8 8", refX:7, refY:4, markerWidth:7, markerHeight:7, orient:"auto-start-reverse", markerUnits:"userSpaceOnUse"}, defs);
+    el("path", {d:"M0 0L8 4L0 8z", style:`fill:var(--${{flow:"flow",back:"back",recycle:"recycle",newobj:"new-obj",read:"read"}[fam]})`}, m);
+  }
+  for (const [key, d, fam, ...labels] of EDGES) {
+    edgeEls[key] = el("path", {d, class:`ed ${fam}`, "marker-end":`url(#a-${fam})`}, edges);
+    edgeEls[key].dataset.fam = fam;
+    for (const l of labels) el("text", {x:l.x, y:l.y, "text-anchor":l.a || "start", class:`el ${fam}`}, svg, l.t);
+  }
+  for (const id in NODES) {
+    const n = NODES[id];
+    const g = el("g", {class:`mapnode ${n.kind}`, tabindex:0, role:"button", "aria-label":`${n.tag}: ${n.name}`}, svg);
+    g.addEventListener("click", () => inspect(id));
+    g.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); inspect(id); } });
+    nodeEls[id] = g;
+    const cx = n.kind === "gate" ? n.cx : n.x + n.w / 2, cy = n.kind === "gate" ? n.cy : n.y + n.h / 2;
+    if (n.kind === "gate") {
+      const p = `${n.cx},${n.cy-n.h/2} ${n.cx+n.w/2},${n.cy} ${n.cx},${n.cy+n.h/2} ${n.cx-n.w/2},${n.cy}`;
+      el("polygon", {points:p, class:"halo", style:`transform-origin:${cx}px ${cy}px`}, g); el("polygon", {points:p, class:"sh"}, g);
+      textLines(g, n.tt, cx, cy, "tt");
+    } else if (n.kind === "tree") {
+      const rx = n.w/2, ry = 15, top = n.y + ry, bot = n.y + n.h - ry;
+      const d = `M${n.x} ${top}A${rx} ${ry} 0 0 1 ${n.x+n.w} ${top}V${bot}A${rx} ${ry} 0 0 1 ${n.x} ${bot}Z`;
+      el("path", {d, class:"sh"}, g);
+      el("path", {d:`M${n.x} ${top}A${rx} ${ry} 0 0 0 ${n.x+n.w} ${top}`, fill:"none", class:"sh", style:"fill:none"}, g);
+      el("text", {x:cx, y:n.y+50, "text-anchor":"middle", class:"tt", style:"font-size:15px"}, g, "Logical tree + notebook");
+      el("text", {x:cx, y:n.y+67, "text-anchor":"middle", class:"el", style:"fill:var(--ink)!important"}, g, "Grows every cycle. Nothing is erased.");
+      const cols = [["c-live","live"],["c-excl","excluded"],["c-runs","runs"],["c-find","findings"],["c-know","knowledge"]];
+      cols.forEach(([cid, lab], i) => {
+        const x = n.x + 40 + i * 67;
+        el("text", {id:cid, x, y:n.y+112, "text-anchor":"middle", class:"count-n"}, g, "0");
+        el("text", {x, y:n.y+130, "text-anchor":"middle", class:"count"}, g, lab);
+      });
+    } else {
+      const rx = n.kind === "stop" ? 20 : 3;
+      el("rect", {x:n.x,y:n.y,width:n.w,height:n.h,rx,class:"halo",style:`transform-origin:${cx}px ${cy}px`}, g);
+      el("rect", {x:n.x,y:n.y,width:n.w,height:n.h,rx,class:"sh"}, g);
+      if (id === "s4" || id === "s5") {
+        textLines(g, n.tt, cx, n.y + 16, "tt");
+        const labs = id === "s4" ? ["Hypothesis 1","Hypothesis 2","Hypothesis 3","None of the above"] : ["Predictions","Predictions","Predictions"];
+        labs.forEach((t, i) => {
+          const w = 72, x = n.x + 10 + i * 76, y = n.y + 34;
+          el("rect", {x, y, width:w, height:34, class:"mini" + (t.startsWith("None") ? " ph" : "")}, g);
+          (t.startsWith("None") ? ["None of","the above"] : [t]).forEach((l, j, a) => el("text", {x:x+w/2, y:y+21+(j-(a.length-1)/2)*12, "text-anchor":"middle", class:"mini-t"}, g, l));
+        });
+      } else textLines(g, n.tt, cx, cy, "tt");
+    }
+    if (n.popper) { const px = n.kind === "gate" ? n.cx : n.x + n.w - 8, py = n.kind === "gate" ? n.cy - n.h/2 + 8 : n.y + 8; el("circle", {cx:px, cy:py, r:5, class:"pop"}, g); }
+  }
+  el("circle", {id:"dot", r:7, cx:-20, cy:-20}, svg);
+}
+
+function paintMap() {
+  const e = ex.trace[pos], walked = new Set();
+  for (let i = 1; i <= pos; i++) pathOf(i).forEach((k) => walked.add(k));
+  for (const k in edgeEls) { edgeEls[k].classList.toggle("walked", walked.has(k)); edgeEls[k].classList.remove("taken","untaken"); }
+  for (const id in nodeEls) { nodeEls[id].classList.toggle("now", id === e.n); nodeEls[id].classList.toggle("viewed", id === view && id !== e.n); }
+  if (NODES[e.n].kind === "gate" && pos < ex.trace.length - 1) {
+    const nextE = ex.trace[pos + 1], chosen = edgeKey(e.n, (nextE.hops || [nextE.n])[0]);
+    for (const k in edgeEls) if (k.startsWith(e.n + ">")) edgeEls[k].classList.add(k === chosen ? "taken" : "untaken");
+  }
+}
+function animate(keys) {
+  const me = ++token, dot = $("dot");
+  dot.setAttribute("cx", -20); dot.setAttribute("cy", -20);
+  if (reduce || !keys.length) return;
+  const perEdge = Math.min(620, 2400 / keys.length) * Math.max(speed, .6);
+  (function go(idx) {
+    if (me !== token) return;
+    if (idx >= keys.length) { dot.setAttribute("cx", -20); return; }
+    const p = edgeEls[keys[idx]], L = p.getTotalLength(), t0 = performance.now();
+    p.classList.add("moving");
+    (function frame(t) {
+      if (me !== token) { p.classList.remove("moving"); return; }
+      const f = Math.min(1, (t - t0) / perEdge), pt = p.getPointAtLength(L * f);
+      dot.setAttribute("cx", pt.x); dot.setAttribute("cy", pt.y);
+      if (f < 1) requestAnimationFrame(frame); else { p.classList.remove("moving"); go(idx + 1); }
+    })(t0);
+  })(0);
+}
+
+/* ---------- Readout ---------- */
+const WHEN = {before:"Written before the run", during:"The run", after:"After the result", all:"Always open"};
+function fieldsHTML(n) {
+  const row = (k, v, cls) => `<div class="${cls || ""}"><dt>${k}</dt><dd>${esc(v)}</dd></div>`;
+  return `<dl class="fields">${row("Needs",n.needs)}${row("Does",n.does)}${row("Outputs",n.outputs)}${row("Stores",n.stores)}${row("Why here",n.why)}${n.popper ? row("Popper",n.popper,"pop-row") : ""}</dl><p class="src">${esc(n.src)}</p>`;
+}
+function renderReadout(s) {
+  const e = ex.trace[pos], id = view || e.n, n = NODES[id];
+  let top;
+  if (id === e.n) {
+    const writes = s.lines.length ? `<div class="writes"><span class="label">Written to the notebook</span>${s.lines.map((l) => `<div>${esc(l)}</div>`).join("")}</div>` : `<p class="wrote-none">Nothing written to the notebook at this moment.</p>`;
+    top = `<div class="story"><span class="label">${esc(ex.cycles[e.c])} · what happens now</span>${e.a ? `<p class="answer">${esc(e.a)}</p>` : ""}<p>${esc(e.t)}</p>${writes}</div>`;
+  } else {
+    const occ = ex.trace.map((t, i) => (t.n === id || (t.hops || []).includes(id)) ? i : -1).filter((i) => i >= 0);
+    const list = occ.length ? `<div class="occ">${occ.map((i) => `<button type="button" data-jump="${i}">${esc(ex.cycles[ex.trace[i].c].split(",")[0])} · ${i + 1}</button>`).join("")}</div>` : `<p>This example never reaches it${id === "tree" ? " as a moment of its own: it is written and read throughout" : ""}.</p>`;
+    top = `<div class="story"><span class="label">Viewing this box. The walkthrough is paused at ${esc(NODES[e.n].tag.toLowerCase())}.</span>${occ.length ? "<p>Jump to a moment when it happens in this example:</p>" : ""}${list}<div><button type="button" id="backnow">Back to the current moment</button></div></div>`;
+  }
+  $("readout").innerHTML = `<div class="r-head"><span class="label">${esc(n.tag)}</span><span class="when ${n.when}">${WHEN[n.when]}</span><h2>${esc(n.name)}</h2></div>${top}${fieldsHTML(n)}`;
+}
+
+/* ---------- Notebook ---------- */
+const fr = (s, id) => s.fresh.has(id) ? " fresh" : "";
+function renderBook(s) {
+  const o = s.objective;
+  const meter = (lab, u, b) => b == null ? "" : `<div class="meter">${lab} ${u == null ? "not yet reported" : u + " of " + b}<div class="bar"><i style="width:${u == null ? 0 : Math.round(100 * u / b)}%"></i></div></div>`;
+  $("objective").innerHTML = `<div class="o"><b>Objective.</b> ${esc(o.text)} <b>Stop when:</b> ${esc(o.stop)}</div><div class="meters">${meter("Runs", s.used && s.used.runs, o.runs)}${meter("Submits", s.used && s.used.subs, o.subs)}${meter("Days", s.used && s.used.days, o.days)}</div>`;
+
+  $("tree").innerHTML = s.nodes.length ? s.nodes.map((mapnode) => {
+    const hs = Object.values(s.hyps).filter((h) => h.n === mapnode.id), rs = Object.values(s.runs).filter((r) => r.n === mapnode.id);
+    const hrows = hs.map((h) => {
+      const name = h.status === "placeholder" || h.status === "true" ? "none" : h.id;
+      const label = {true:"came true"}[h.status] || h.status;
+      return `<div class="h-row ${h.status}${fr(s, h.id)}"><span class="mono">${esc(name)}</span><span class="tx">${esc(h.text)}${h.pred ? `<span class="pr">Predicts: ${esc(h.pred)}</span>` : ""}</span><span class="chip ${h.status}">${esc(label)}${h.by ? " · " + esc(h.by) : ""}</span></div>`;
+    }).join("");
+    const rrows = rs.length ? `<div class="runs">${rs.map((r) => `<div class="run${fr(s, r.id)}"><span class="mono">${r.id}</span>${esc(r.text)}${r.res ? `: <b style="font-weight:600">${esc(r.res)}</b>` : ` <span class="pending">(designed, not yet run)</span>`}</div>`).join("")}</div>` : "";
+    return `<div class="tnode${mapnode.parent ? " child" : ""}${fr(s, mapnode.id)}"><div class="q"><span class="mono">${mapnode.id}</span>${esc(mapnode.q)}</div>${mapnode.note ? `<p class="note">${esc(mapnode.note)}</p>` : ""}${hrows}${rrows}</div>`;
+  }).join("") : `<p class="empty">Empty. The first node opens when a question passes the gate after step 3.</p>`;
+
+  const fs = Object.values(s.finds);
+  $("finds").innerHTML = fs.length ? fs.map((f) => `<div class="f-card${fr(s, f.id)}"><div class="fh"><span class="mono" style="font-weight:500">${f.id}</span><span class="chip ${f.status}">${f.status}</span></div><p>${esc(f.text)}</p><div class="trail">${f.trail.map((t) => `<button type="button" data-jump="${t.i}" title="${esc(t.say)}">${esc(t.say.split(":")[0])}</button>`).join("")}</div></div>`).join("") : `<p class="empty">None yet. Step 8 logs the first one.</p>`;
+
+  const logs = [...s.rescues.map((t, i) => `<p class="logline${fr(s, "rescue" + i)}"><span class="chip">rescue</span> ${esc(t)}</p>`), ...s.hyg.map((t, i) => `<p class="logline${fr(s, "hyg" + i)}"><span class="chip">hygiene</span> ${esc(t)}</p>`)];
+  $("logs").innerHTML = logs.length ? logs.join("") : `<p class="empty">Clean so far.</p>`;
+
+  const ks = Object.values(s.know);
+  $("know").innerHTML = ks.length ? `<ul>${ks.map((k) => `<li class="${fr(s, k.id)}">${esc(k.text)} <span class="runs-of">(${esc(k.by)})</span></li>`).join("")}</ul>` : `<p class="empty" style="color:var(--ink)">Empty. A corroboration with a test still owed does not count.</p>`;
+
+  const hs = Object.values(s.hyps);
+  $("c-live").textContent = hs.filter((h) => h.status === "live" || h.status === "corroborated" || h.status === "untested").length;
+  $("c-excl").textContent = hs.filter((h) => h.status === "excluded").length;
+  $("c-runs").textContent = Object.values(s.runs).filter((r) => r.res).length;
+  $("c-find").textContent = fs.length;
+  $("c-know").textContent = ks.length;
+}
+
+/* ---------- Timeline ---------- */
+function buildTicks() {
+  const box = $("ticks"); box.innerHTML = "";
+  ex.cycles.forEach((name, c) => {
+    const items = ex.trace.map((t, i) => [t, i]).filter(([t]) => t.c === c);
+    const cyc = document.createElement("div"); cyc.className = "cyc"; cyc.style.flex = `${items.length} 1 0`;
+    cyc.innerHTML = `<span class="label">${esc(name)}</span><div class="cyc-ticks"></div>`;
+    const row = cyc.querySelector(".cyc-ticks");
+    for (const [t, i] of items) {
+      const b = document.createElement("button");
+      b.type = "button"; b.dataset.jump = i; b.className = `tick ${NODES[t.n].when}${t.fail ? " fail" : ""}`;
+      b.title = NODES[t.n].tag; b.setAttribute("aria-label", `Moment ${i + 1}: ${NODES[t.n].name}`);
+      row.appendChild(b);
+    }
+    box.appendChild(cyc);
+  });
+}
+function paintTicks() {
+  document.querySelectorAll(".tick").forEach((b) => { const i = +b.dataset.jump; b.classList.toggle("past", i < pos); b.classList.toggle("now", i === pos); if (i === pos) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current"); });
+  const e = ex.trace[pos];
+  $("where").textContent = `Moment ${pos + 1} of ${ex.trace.length} · ${ex.cycles[e.c].split(",")[0]} · ${NODES[e.n].tag}`;
+  $("prev").disabled = pos === 0; $("next").disabled = pos === ex.trace.length - 1;
+}
+
+/* ---------- Control ---------- */
+function render(walk) {
+  const s = fold(pos);
+  paintTicks(); paintMap(); renderReadout(s); renderBook(s);
+  if (walk) animate(pathOf(pos)); else { token++; $("dot").setAttribute("cx", -20); }
+}
+function go(i, walk) { pos = Math.max(0, Math.min(ex.trace.length - 1, i)); view = null; render(walk); }
+function inspect(id) { pause(); view = id === ex.trace[pos].n ? null : id; render(false); }
+function dwell() { const e = ex.trace[pos]; return Math.max(2600, (e.t.length + (e.a ? e.a.length : 0)) * 48) * speed; }
+function schedule() { clearTimeout(timer); timer = setTimeout(() => { if (pos >= ex.trace.length - 1) { pause(); return; } go(pos + 1, true); schedule(); }, dwell()); }
+function play() { if (timer) return; if (pos >= ex.trace.length - 1) go(0, false); else if (view) { view = null; render(false); } $("play").textContent = "❚❚ Pause"; timer = 1; schedule(); }
+function pause() { clearTimeout(timer); timer = null; $("play").textContent = "▶ Play"; }
+$("play").addEventListener("click", () => timer ? pause() : play());
+$("next").addEventListener("click", () => { pause(); go(pos + 1, true); });
+$("prev").addEventListener("click", () => { pause(); go(pos - 1, false); });
+$("example").addEventListener("change", (e) => { pause(); ex = EXAMPLES[+e.target.value]; pos = 0; view = null; buildTicks(); render(false); });
+document.querySelectorAll("[data-speed]").forEach((b) => b.addEventListener("click", () => {
+  speed = +b.dataset.speed; document.querySelectorAll("[data-speed]").forEach((o) => o.setAttribute("aria-pressed", o === b)); if (timer) schedule();
+}));
+document.addEventListener("click", (e) => {
+  const j = e.target.closest("[data-jump]"); if (j) { pause(); go(+j.dataset.jump, false); return; }
+  if (e.target.id === "backnow") { view = null; render(false); }
+});
+document.addEventListener("keydown", (e) => {
+  if (e.target.closest("select")) return;
+  if (e.key === "ArrowRight") { e.preventDefault(); pause(); go(pos + 1, true); }
+  else if (e.key === "ArrowLeft") { e.preventDefault(); pause(); go(pos - 1, false); }
+  else if (e.key === " " && !e.target.closest("button")) { e.preventDefault(); timer ? pause() : play(); }
+});
+buildMap(); buildTicks(); render(false);
+</script>
