@@ -1,0 +1,309 @@
+<mxfile host="65bd71144e">
+    <diagram id="_wSKEAbzOnW_7PyPfBVy" name="Page-1">
+        <mxGraphModel dx="1491" dy="755" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1460" pageHeight="970" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="frame" parent="1" style="rounded=1;arcSize=2;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;dashed=1;verticalAlign=top;align=left;spacingLeft=8;fontStyle=2;fontColor=#666666;fontSize=13;" value="discovery phase" vertex="1">
+                    <mxGeometry height="450" width="510" x="915" y="212" as="geometry"/>
+                </mxCell>
+                <mxCell id="bW4NQQmewjmJznq9_Is1-42" parent="1" style="rounded=1;arcSize=3;whiteSpace=wrap;html=1;fillColor=#f7f9fc;strokeColor=#6c8ebf;verticalAlign=top;fontSize=13;" value="&lt;b&gt;Know the field&lt;/b&gt;: loop until a question is worth pursuing" vertex="1">
+                    <mxGeometry height="225" width="400" x="290" y="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-4" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;verticalAlign=top;" value="&lt;b&gt;4. Write the family of hypotheses, then prune to a handful&lt;/b&gt;&lt;br&gt;Each must answer the question and forbid some outcome. Prefer the bold one that says more." vertex="1">
+                    <mxGeometry height="130" width="480" x="930" y="240" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-5" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;verticalAlign=bottom;" value="&lt;b&gt;5. For each hypothesis, derive the predictions it makes&lt;/b&gt;&lt;br&gt;Keep only risky predictions: ones it cannot survive being wrong about, that would not be expected without it, and that state a size and a condition, not only a direction" vertex="1">
+                    <mxGeometry height="140" width="480" x="930" y="390" as="geometry"/>
+                </mxCell>
+                <mxCell id="bW4NQQmewjmJznq9_Is1-10" edge="1" parent="1" source="bW4NQQmewjmJznq9_Is1-9" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.3333;entryDx=0;entryDy=0;" target="bW4NQQmewjmJznq9_Is1-42" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="bW4NQQmewjmJznq9_Is1-17" edge="1" parent="1" source="bW4NQQmewjmJznq9_Is1-13" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="bW4NQQmewjmJznq9_Is1-16" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="bW4NQQmewjmJznq9_Is1-20" edge="1" parent="1" source="bW4NQQmewjmJznq9_Is1-16" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=1;exitY=0.4941;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="bW4NQQmewjmJznq9_Is1-19" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="bW4NQQmewjmJznq9_Is1-22" edge="1" parent="1" source="bW4NQQmewjmJznq9_Is1-19" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="bW4NQQmewjmJznq9_Is1-21" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="bW4NQQmewjmJznq9_Is1-23" edge="1" parent="1" source="bW4NQQmewjmJznq9_Is1-21" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="bW4NQQmewjmJznq9_Is1-13" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-e1" edge="1" parent="1" source="bW4NQQmewjmJznq9_Is1-42" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=1;exitY=0.4667;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="bW4NQQmewjmJznq9_Is1-28" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="bW4NQQmewjmJznq9_Is1-30" edge="1" parent="1" source="bW4NQQmewjmJznq9_Is1-28" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="si-g3" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-e2" edge="1" parent="1" source="si-g3" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=#3a6ea5;labelBackgroundColor=#ffffff;fontSize=12;" target="bW4NQQmewjmJznq9_Is1-42" value="No: not yet a good question">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1170" y="18"/>
+                            <mxPoint x="490" y="18"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="bW4NQQmewjmJznq9_Is1-32" edge="1" parent="1" source="si-g3" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=#ffffff;fontSize=12;" target="si-4" value="Yes">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-e3" edge="1" parent="1" source="bW4NQQmewjmJznq9_Is1-29" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="bW4NQQmewjmJznq9_Is1-31" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-e4" edge="1" parent="1" source="si-h2" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="si-p2" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-e5" edge="1" parent="1" source="si-h3" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="si-p3" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="bW4NQQmewjmJznq9_Is1-34" edge="1" parent="1" source="si-5" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="bW4NQQmewjmJznq9_Is1-33" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="bW4NQQmewjmJznq9_Is1-36" edge="1" parent="1" source="bW4NQQmewjmJznq9_Is1-33" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="bW4NQQmewjmJznq9_Is1-35" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="bW4NQQmewjmJznq9_Is1-38" edge="1" parent="1" source="bW4NQQmewjmJznq9_Is1-35" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="si-g7" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-e6" edge="1" parent="1" source="si-g7" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#3a6ea5;" target="bW4NQQmewjmJznq9_Is1-33" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="920" y="600"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="si-e7" edge="1" parent="1" source="si-g7" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#ffffff;fontSize=12;" target="si-8" value="Yes">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-e8" edge="1" parent="1" source="bW4NQQmewjmJznq9_Is1-37" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="si-g8" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="bW4NQQmewjmJznq9_Is1-43" edge="1" parent="1" source="si-8" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0.2105;exitY=0;exitDx=0;exitDy=0;entryX=0.9;entryY=1;entryDx=0;entryDy=0;strokeColor=#3a6ea5;" target="bW4NQQmewjmJznq9_Is1-42" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-e9" edge="1" parent="1" source="bW4NQQmewjmJznq9_Is1-37" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.662;entryY=1;entryDx=0;entryDy=0;dashed=1;strokeColor=#82b366;strokeWidth=2;" target="si-tree" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-e10" edge="1" parent="1" source="si-tree" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.3625;entryY=1;entryDx=0;entryDy=0;dashed=1;strokeColor=#82b366;strokeWidth=2;" target="bW4NQQmewjmJznq9_Is1-42" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-e11" edge="1" parent="1" source="si-g8" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="si-a" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="310" y="797"/>
+                            <mxPoint x="325" y="797"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="si-e12" edge="1" parent="1" source="si-g8" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="si-b" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="310" y="797"/>
+                            <mxPoint x="515" y="797"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="si-e13" edge="1" parent="1" source="si-g8" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="si-c" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="310" y="797"/>
+                            <mxPoint x="705" y="797"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="si-e14" edge="1" parent="1" source="si-g8" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="si-d" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="310" y="797"/>
+                            <mxPoint x="895" y="797"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="si-e15" edge="1" parent="1" source="si-c" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#b85450;strokeWidth=2;" target="si-4" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="705" y="915"/>
+                            <mxPoint x="1440" y="915"/>
+                            <mxPoint x="1440" y="305"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="bW4NQQmewjmJznq9_Is1-39" edge="1" parent="1" source="si-d" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#b85450;strokeWidth=2;" target="si-4" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="895" y="915"/>
+                            <mxPoint x="1440" y="915"/>
+                            <mxPoint x="1440" y="305"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="si-e16" edge="1" parent="1" source="si-a" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.6538;entryDx=0;entryDy=0;" target="si-use" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-e17" edge="1" parent="1" source="si-b" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="si-use" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="515" y="915"/>
+                            <mxPoint x="120" y="915"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="si-e18" edge="1" parent="1" source="si-g9" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;labelBackgroundColor=#ffffff;fontSize=12;" target="si-end" value="Yes">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-e19" edge="1" parent="1" source="si-g9" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;strokeColor=#3a6ea5;" target="bW4NQQmewjmJznq9_Is1-28" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="15" y="695"/>
+                            <mxPoint x="15" y="290"/>
+                            <mxPoint x="880" y="290"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="bW4NQQmewjmJznq9_Is1-9" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" value="&lt;b&gt;0. Define the objective&lt;/b&gt;&lt;br&gt;Root of the tree, stop criterion, budget" vertex="1">
+                    <mxGeometry height="90" width="200" x="40" y="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="bW4NQQmewjmJznq9_Is1-13" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" value="&lt;b&gt;1.&lt;/b&gt; Write down questions to guide the literature review" vertex="1">
+                    <mxGeometry height="70" width="170" x="305" y="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="bW4NQQmewjmJznq9_Is1-16" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" value="&lt;b&gt;2.&lt;/b&gt; Literature review, observations, pilots and baselines" vertex="1">
+                    <mxGeometry height="85" width="170" x="305" y="170" as="geometry"/>
+                </mxCell>
+                <mxCell id="bW4NQQmewjmJznq9_Is1-19" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=13;" value="Answer questions" vertex="1">
+                    <mxGeometry height="60" width="170" x="505" y="182" as="geometry"/>
+                </mxCell>
+                <mxCell id="bW4NQQmewjmJznq9_Is1-21" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=13;" value="Refine questions" vertex="1">
+                    <mxGeometry height="60" width="170" x="505" y="85" as="geometry"/>
+                </mxCell>
+                <mxCell id="bW4NQQmewjmJznq9_Is1-28" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" value="&lt;b&gt;3. Pick a question&lt;/b&gt;&lt;br&gt;First decide each open finding: promote if it repeats on new data, defer or drop, with a reason. Then pick from what is unanswered or puzzling" vertex="1">
+                    <mxGeometry height="130" width="200" x="780" y="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-g3" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;" value="How or why question that serves the objective?" vertex="1">
+                    <mxGeometry height="110" width="200" x="1070" y="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="bW4NQQmewjmJznq9_Is1-29" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=13;" value="Hypothesis 1" vertex="1">
+                    <mxGeometry height="50" width="105" x="945" y="305" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-h2" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=13;" value="Hypothesis 2" vertex="1">
+                    <mxGeometry height="50" width="105" x="1060" y="305" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-h3" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=13;" value="Hypothesis 3" vertex="1">
+                    <mxGeometry height="50" width="105" x="1175" y="305" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-h4" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=13;dashed=1;" value="None of the above" vertex="1">
+                    <mxGeometry height="50" width="105" x="1290" y="305" as="geometry"/>
+                </mxCell>
+                <mxCell id="bW4NQQmewjmJznq9_Is1-31" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=13;" value="Predictions of H1" vertex="1">
+                    <mxGeometry height="50" width="105" x="945" y="400" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-p2" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=13;" value="Predictions of H2" vertex="1">
+                    <mxGeometry height="50" width="105" x="1060" y="400" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-p3" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=13;" value="Predictions of H3" vertex="1">
+                    <mxGeometry height="50" width="105" x="1175" y="400" as="geometry"/>
+                </mxCell>
+                <mxCell id="bW4NQQmewjmJznq9_Is1-33" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" value="&lt;b&gt;6. Design the crucial experiment&lt;/b&gt;&lt;br&gt;Before running, write which hypotheses each outcome excludes, what would count as a refutation (effect size, seeds or replications, power), which auxiliary assumptions may be blamed, plus the controls. It must be informative either way." vertex="1">
+                    <mxGeometry height="100" width="480" x="930" y="550" as="geometry"/>
+                </mxCell>
+                <mxCell id="bW4NQQmewjmJznq9_Is1-35" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" value="&lt;b&gt;7. Run the experiment&lt;/b&gt;&lt;br&gt;Before reading the result, check the run matched the design: code, data, statistics" vertex="1">
+                    <mxGeometry height="90" width="200" x="1070" y="675" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-g7" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;" value="Is the result clean?" vertex="1">
+                    <mxGeometry height="100" width="180" x="830" y="670" as="geometry"/>
+                </mxCell>
+                <mxCell id="bW4NQQmewjmJznq9_Is1-37" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" value="&lt;b&gt;9. Record the results&lt;/b&gt;&lt;br&gt;Excluded, surviving, undecided, which run decided, how severe (would the test have failed the hypothesis had it been false?), and the findings, even if none" vertex="1">
+                    <mxGeometry height="140" width="190" x="400" y="650" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-g8" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;" value="What survives?" vertex="1">
+                    <mxGeometry height="110" width="140" x="240" y="665" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-a" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=13;" value="&lt;b&gt;One:&lt;/b&gt; best of this family, not proven. It must pass its own risky test before it counts" vertex="1">
+                    <mxGeometry height="80" width="170" x="240" y="820" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-b" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=13;" value="&lt;b&gt;Several, each partly right:&lt;/b&gt; measure each contribution" vertex="1">
+                    <mxGeometry height="70" width="170" x="430" y="820" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-c" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=13;" value="&lt;b&gt;Several rivals, or undecided:&lt;/b&gt; new crucial experiment, more power, or sub-hypotheses" vertex="1">
+                    <mxGeometry height="85" width="170" x="620" y="820" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-d" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=13;" value="&lt;b&gt;None:&lt;/b&gt; the family was incomplete, add new hypotheses" vertex="1">
+                    <mxGeometry height="70" width="170" x="810" y="820" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-g9" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;" value="Objective met, budget spent, or objective wrong?" vertex="1">
+                    <mxGeometry height="124" width="200" x="20" y="633" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-end" parent="1" style="rounded=1;arcSize=50;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=13;" value="&lt;b&gt;Stop&lt;/b&gt;: report exclusions, survivors, the tests they passed, what would still refute them, and every finding with its status. Every claim names its run; interpretation is marked as such" vertex="1">
+                    <mxGeometry height="150" width="180" x="30" y="450" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-tree" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=18;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;" value="&lt;b&gt;Logical tree + notebook&lt;/b&gt;&lt;br&gt;The accumulated knowledge&lt;br&gt;Node: question + live hypotheses&lt;br&gt;Edge: crucial experiment, the outcome picks the branch&lt;br&gt;Excluded hypotheses stay, with the run that excluded them&lt;br&gt;Untested hypotheses stay visible&lt;br&gt;Findings stay with a status: open, promoted, deferred or dropped, each with its reason&lt;br&gt;An exclusion holds under its conditions: if they change, reopen it as a finding&lt;br&gt;What holds becomes project knowledge, read by the next project" vertex="1">
+                    <mxGeometry height="280" width="370" x="250" y="320" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-t1" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=12;align=right;" value="No: fix the run or controls, no exclusion recorded. Blame only an auxiliary declared in step 6, never rescue ad hoc, and log the rescue and its cause: a hypothesis saved repeatedly is excluded" vertex="1">
+                    <mxGeometry height="135" width="175" x="740" y="512" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-t2" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=12;align=left;" value="No: next sub-question, or a new puzzle from the data" vertex="1">
+                    <mxGeometry height="46" width="145" x="25" y="292" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-t3" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=12;fontColor=#4d8a3d;" value="read at step 2" vertex="1">
+                    <mxGeometry height="22" width="170" x="445" y="295" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-t4" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=12;fontColor=#4d8a3d;" value="write" vertex="1">
+                    <mxGeometry height="20" width="40" x="500" y="615" as="geometry"/>
+                </mxCell>
+                <mxCell id="bW4NQQmewjmJznq9_Is1-44" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=12;align=left;fontColor=#3a6ea5;" value="go back here when a finding shows a gap in knowledge" vertex="1">
+                    <mxGeometry height="50" width="170" x="660" y="440" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-e20" edge="1" parent="1" source="si-tree" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=1;exitY=0.2857;exitDx=0;exitDy=0;entryX=0.6;entryY=1;entryDx=0;entryDy=0;dashed=1;strokeColor=#82b366;strokeWidth=2;" target="bW4NQQmewjmJznq9_Is1-28" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="900" y="400"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="si-t5" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=12;fontColor=#4d8a3d;" value="read at steps 3 and 4: findings" vertex="1">
+                    <mxGeometry height="22" width="215" x="675" y="376" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-8" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" value="&lt;b&gt;8. Analyze beyond the hypotheses&lt;/b&gt;&lt;br&gt;Same checks every run, whatever the hypothesis: errors by class and group, worst cases. Log what nobody predicted as a finding." vertex="1">
+                    <mxGeometry height="140" width="190" x="610" y="650" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-use" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" value="&lt;b&gt;10. Use what was learned&lt;/b&gt;&lt;br&gt;What change does it justify? Not yet measured: predict it and run it through steps 5 to 9. Measured: store what holds, and under which conditions, as project knowledge" vertex="1">
+                    <mxGeometry height="130" width="200" x="20" y="775" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-e21" edge="1" parent="1" source="si-8" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="bW4NQQmewjmJznq9_Is1-37" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-e22" edge="1" parent="1" source="si-use" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;labelBackgroundColor=#ffffff;fontSize=12;" target="si-g9" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-e23" edge="1" parent="1" source="si-use" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0.2;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#b85450;strokeWidth=2;" target="si-5" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="60" y="955"/>
+                            <mxPoint x="1450" y="955"/>
+                            <mxPoint x="1450" y="460"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="si-t6" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontSize=12;fontColor=#b85450;" value="Not yet measured: a new prediction and experiment" vertex="1">
+                    <mxGeometry height="18" width="340" x="250" y="935" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-t7" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontSize=12;" value="Measured" vertex="1">
+                    <mxGeometry height="16" width="60" x="125" y="758" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-e24" edge="1" parent="1" source="si-end" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0.8333;exitY=0;exitDx=0;exitDy=0;entryX=0.7;entryY=1;entryDx=0;entryDy=0;strokeColor=#9673a6;strokeWidth=2;" target="bW4NQQmewjmJznq9_Is1-9" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-t8" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;rounded=0;fontSize=12;fontColor=#9673a6;" value="New or revised objective, starting from project knowledge" vertex="1">
+                    <mxGeometry height="50" width="145" x="30" y="375" as="geometry"/>
+                </mxCell>
+                <mxCell id="si-popper" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;verticalAlign=top;align=left;spacingLeft=6;spacingRight=6;" value="&lt;b&gt;Popper, Conjectures and Refutations (1963)&lt;/b&gt;&lt;br&gt;Start from a problem, not from observations; hypotheses are bold guesses, not inductions from the review. A good hypothesis forbids outcomes; one that nothing could refute says nothing. Confirmations are easy to find and count only when they came from a risky prediction. Surviving a severe test corroborates, it never proves. Rescuing a refuted hypothesis ad hoc saves it at the cost of its scientific status." vertex="1">
+                    <mxGeometry height="135" width="440" x="990" y="775" as="geometry"/>
+                </mxCell>
+                <mxCell id="bW4NQQmewjmJznq9_Is1-40" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=12;align=right;fontStyle=1;fontColor=#b85450;" value="Recycle this loop and create knowledge" vertex="1">
+                    <mxGeometry height="24" width="260" x="1180" y="922" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
