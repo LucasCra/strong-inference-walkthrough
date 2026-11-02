@@ -228,7 +228,7 @@ select { max-width: 100%; }
     <h1 style="margin-top:7px">Strong inference, one step at a time</h1>
     <p class="lead">Strong inference is a way to do research: write several rival explanations, design an experiment that rules some of them out, then repeat with what is left. Press Play to watch an invented ML project move through the workflow, and see what each step needs, does, produces and stores.</p>
   </div>
-  <p class="status"><b>An untested concept.</b> Nobody has run this workflow on a real problem. Every run and number in the walkthrough is invented, except the two facts marked (real). The “needs” and “outputs” fields are this page’s summary of the diagram and its explanation.</p>
+  <p class="status"><b>An untested concept.</b> Nobody has run this workflow on a real problem. Every run and number in the walkthrough is invented, except the two facts marked (real). The “needs”, “outputs” and “stores” fields, and some “why here” text, are this page’s summary of the diagram and its explanation.</p>
 </header>
 </div>
 
@@ -311,12 +311,12 @@ select { max-width: 100%; }
   <section>
     <div class="sec-head">
       <h2>How knowledge is kept, and what limits it</h2>
-      <p>Each kind of record is written at one step and read at another. Each can also be undone: nothing in the tree is final.</p>
+      <p>Each kind of record has a place where it is written and a place where it is read. All but the rescue log can also be undone.</p>
     </div>
     <div class="tw"><table>
       <thead><tr><th>Record</th><th>What it says</th><th>Written</th><th>Read</th><th>What can undo it</th></tr></thead>
       <tbody>
-        <tr><td>Exclusion</td><td>This hypothesis failed, in this run, on a test of this severity.</td><td>Step 9</td><td>Tree, at steps 2, 3 and 4</td><td>A change of conditions or a contradicting result reopens it as a finding.</td></tr>
+        <tr><td>Exclusion</td><td>This hypothesis failed, in this run, on a test of this severity.</td><td>Step 9</td><td>Step 2, where the tree is read for what is known</td><td>A change of conditions or a contradicting result reopens it as a finding.</td></tr>
         <tr><td>Survivor</td><td>Best of this family, not proven. “None of the above” stays live.</td><td>Step 9</td><td>Step 10, where it must pass its own risky test</td><td>A failed use at step 10, or what the Stop report names as still able to refute it.</td></tr>
         <tr><td>Finding</td><td>Something no hypothesis predicted, with its size and run.</td><td>Step 8, kept at step 9</td><td>Step 3 every cycle, step 4 after a recycle</td><td>A decision with a reason: promote, defer or drop.</td></tr>
         <tr><td>Rescue log</td><td>A run was not clean. Its cause, and the declared auxiliary that was blamed.</td><td>The not-clean branch</td><td>Whenever a hypothesis keeps being saved</td><td>It does not go away. A hypothesis saved repeatedly is excluded.</td></tr>
@@ -363,12 +363,14 @@ select { max-width: 100%; }
         <li>Whether all these rules pay for their cost</li>
         <li>Thresholds: how many hypotheses, seeds or checks are enough</li>
         <li>Recording pruned hypotheses</li>
+        <li>Rivals that predict the same thing, which only step 6’s outcome table can catch</li>
+        <li>Three reasons to stop sharing one gate: success, an empty budget and a wrong objective</li>
         <li>Outside criticism and independent replication</li>
       </ul>
     </div>
   </section>
 
-  <footer>Built from <span class="mono">strong_inference_workflow.drawio</span>, <span class="mono">workflow_explanation.md</span>, <span class="mono">applied_example.md</span> and <span class="mono">applied_example_2.md</span> at commit <span class="mono">294b092</span>. Neither example reaches “Several rivals, or undecided”, or step 8’s edge back to “Know the field”, so those two paths never light up.</footer>
+  <footer>Built from <span class="mono">strong_inference_workflow.drawio</span>, <span class="mono">workflow_explanation.md</span>, <span class="mono">applied_example.md</span> and <span class="mono">applied_example_2.md</span> at commit <span class="mono">294b092</span>. Neither example reaches “Several rivals, or undecided”, or step 8’s edge back to “Know the field”, so those two paths never light up. The walkthrough also leaves two things dark on purpose: “Refine questions” and its edges, because the moment at “Answer questions” covers the refining, and the green tree edges, because the tree is read and written throughout.</footer>
 </div>
 
 <script>
@@ -389,14 +391,14 @@ const NODES = {
     outputs:"A short list of questions for step 2.",
     stores:"Nothing in the tree. The questions go in the notebook.",
     why:"Written first, the questions keep the review pointed at the objective.",
-    src:"Jewett’s exploratory phase. Chamberlin: first full facts, then interpretations."},
+    src:"Chamberlin: first full facts, then interpretations. The loop as a whole is Jewett’s exploratory and pilot phase."},
   s2: {kind:"step", x:187,y:120,w:120,h:46, tt:["2. Review, pilots,","baselines"], tag:"Step 2", name:"Literature review, observations, pilots and baselines", when:"before",
     needs:"The questions from step 1. The tree and project knowledge, read here by the green edge.",
     does:"Read, look at the data, run small pilots and baselines. A pilot measures the noise, so a real gap can be told from chance.",
     outputs:"Background knowledge and puzzles.",
     stores:"Notes in the notebook.",
     why:"A second project starts here from what the first one excluded, instead of from zero.",
-    src:"Popper’s correction: this is background for designing refutations. Hypotheses are guesses made at step 4.",
+    src:"Jewett’s exploratory and pilot phase. Popper’s correction: this is background for designing refutations. Hypotheses are guesses made at step 4.",
     popper:"Hypotheses do not come from the review. It supplies the background for refuting them."},
   ans: {kind:"box", x:325,y:120,w:118,h:46, tt:["Answer","questions"], tag:"Inside the loop", name:"Answer the questions", when:"before",
     needs:"What the review, pilots and baselines showed.",
@@ -404,14 +406,14 @@ const NODES = {
     outputs:"Answers, and new questions that appeared.",
     stores:"Notes in the notebook.",
     why:"The loop ends when a question is worth pursuing, usually because a puzzle is on the table.",
-    src:"Jewett’s pilot phase."},
+    src:"Part of the know-the-field loop, which as a whole is Jewett’s exploratory and pilot phase."},
   ref: {kind:"box", x:325,y:52,w:118,h:46, tt:["Refine","questions"], tag:"Inside the loop", name:"Refine the questions", when:"before",
     needs:"The answers so far.",
     does:"Sharpen the questions and go round again, until a question is worth pursuing.",
     outputs:"A better set of questions for step 1.",
     stores:"Notes in the notebook.",
-    why:"The loop may run several times before moving on. The walkthrough shows each pass as one moment.",
-    src:"Jewett’s pilot phase."},
+    why:"The loop may run several times before moving on. The walkthrough does not stop at this box: the moment at “Answer questions” covers the refining too.",
+    src:"Part of the know-the-field loop, which as a whole is Jewett’s exploratory and pilot phase."},
   s3: {kind:"step", x:490,y:50,w:130,h:70, tt:["3. Pick a question","and decide open","findings first"], tag:"Step 3", name:"Pick a question", when:"before",
     needs:"Open findings, read from the tree. What is unanswered or puzzling.",
     does:"First decide each open finding: promote if it repeats on new data, defer or drop, with a reason. Then pick from what is unanswered or puzzling.",
@@ -528,7 +530,7 @@ const NODES = {
     does:"Ask whether to stop. There are three reasons: success, no budget, or a sign the objective itself is wrong.",
     outputs:"Yes: Stop. No: back to step 3.",
     stores:"Budget used so far.",
-    why:"It comes after step 10, because the objective can only be met by a measured change.",
+    why:"Step 10 leads here. A use returns to step 10 once measured, and only then goes on to this gate.",
     src:"Platt has no stop rule. The third reason is marked as inference."},
   stop: {kind:"stop", x:20,y:270,w:130,h:100, tt:["Stop: report","exclusions,","survivors, findings"], tag:"Stop", name:"Stop and report", when:"after",
     needs:"The whole tree.",
@@ -562,7 +564,7 @@ const EDGES = [
   ["s8>s9","M480 448H450","flow"],["s9>g8","M330 448H305","flow"],
   ["s8>know","M595 420V408H628V194H440V178","back",{x:622,y:300,t:"finding shows",a:"end"},{x:622,y:313,t:"a gap in",a:"end"},{x:622,y:326,t:"knowledge",a:"end"}],
   ["g8>oOne","M245 490V510H232V530","flow"],["g8>oSev","M245 490V510H377V530","flow"],["g8>oRiv","M245 490V510H522V530","flow"],["g8>oNone","M245 490V510H667V530","flow"],
-  ["oRiv>s4","M522 592V612H1003V189H980","recycle",{x:800,y:607,t:"Recycle: new hypotheses",a:"middle"}],
+  ["oRiv>s4","M522 592V612H1003V189H980","recycle",{x:800,y:607,t:"Recycle: back to step 4",a:"middle"}],
   ["oNone>s4","M667 592V612H1003V189H980","recycle"],
   ["oOne>s10","M165 561H150","flow"],["oSev>s10","M377 592V604H110V596","flow"],
   ["s10>s5","M50 596V632H1017V279H980","recycle",{x:500,y:627,t:"Not yet measured: a new prediction and experiment",a:"middle"}],
@@ -649,7 +651,7 @@ const EX1 = {cycles:["Cycle 1","Cycle 2","Cycle 3, new objective"], trace:[
  {c:1,n:"g7",a:"Yes, clean.",t:"The baseline’s difference of 0.01 does not count toward the stop criterion, because the split was chosen with that score in view."},
  {c:1,n:"s8",t:"The same checks again. F001 repeats at 56% on a different model under a different split, so it no longer depends on one run. And something new: all three estimates sit above their public scores.",
   w:[find("F001",null,"deferred","repeated at 56% on E005"),find("F002","All three estimates sit above their public scores: 0.01, 0.02, 0.02.","open","seen at step 8")]},
- {c:1,n:"s9",t:"P003 excludes H005. P002 excludes H007 and H009. E003 corroborates H006. E004 and E005 corroborate H001 and H006. Severity is medium: a protocol off by 0.04 would still pass both submissions between 8% and 29% of the time.",
+ {c:1,n:"s9",t:"P003 excludes H005, and P002 excludes H007 and H009 (both medium severity). E003 corroborates H006 (high for the drop, low for the threshold). E004 and E005 corroborate H001 and H006 (medium: a protocol off by 0.04 would still pass both submissions between 8% and 29% of the time).",
   w:[set("H003","excluded","P001, P003"),set("H005","excluded","P003"),set("H007","excluded","P002"),set("H009","excluded","P002"),set("H006","corroborated","E003, E004, E005"),set("H001","corroborated","E001, E004, E005")]},
  {c:1,n:"g8",a:"One tested survivor: H006, with its parent H001.",t:"H008 is still live, but nothing has been run against it, so it is not a measured rival. The placeholder stays live."},
  {c:1,n:"oOne",t:"Best of this family, not proven. E003 and the two retests are the risky tests it had to pass. The debt from cycle 1 is paid."},
@@ -734,12 +736,12 @@ const EX2 = {cycles:["Round 1","Round 2"], trace:[
  {c:1,n:"s8",t:"The same checks on the full factorial. Something else appears that no hypothesis mentions: arms with the loss gain more on long prompts.",
   w:[find("F002","Arms with the auxiliary loss gain 1.9 on long prompts and 0.4 on short ones. Source: E002.","open","seen at step 8")]},
  {c:1,n:"s9",t:"E002 excludes H007, and corroborates H005 (high). E003 corroborates H006 (medium: 0.8 is a floor, since no sweep was run). P001 corroborates H005’s mechanism (medium).",
-  w:[set("H007","excluded","E002"),set("H005","corroborated","E002, P001"),set("H006","corroborated","E003"),find("F001",null,"closed","tested by P001: closed")]},
+  w:[set("H007","excluded","E002"),set("H005","corroborated","E002, P001"),set("H006","corroborated","E003"),find("F001",null,"promoted","tested by P001: mechanism corroborated")]},
  {c:1,n:"g8",a:"Several, each partly right: H005 and H006.",t:"They are complementary, not rivals. An interaction and an undertuned baseline can both hold."},
  {c:1,n:"oSev",t:"Measure each contribution. Baseline settings 0.8, curriculum 1.5, loss 1.1, schedule alone 0.6, curriculum × schedule 2.0. They sum to 6.0. The paper’s attribution is partly right: the curriculum is in 3.5 of the 6.0 points, but 2.0 of those exist only with the long schedule."},
  {c:1,n:"s10",t:"Apply: adopt the recipe’s settings, the loss, and the curriculum together with the long schedule. Do not adopt the long schedule without the curriculum. This is not yet measured, and the weights came from another training set, so it can fail."},
- {c:1,n:"s10",hops:["s5","s6","s7","g7","s8","s9","g8","oSev","s10"],t:"E004, on our own pipeline, written before the run: a gain of at least 4.0 over 58.0. Result: 63.2 ± 0.3, a gain of 5.2. Store what holds, with its conditions.",
-  w:[run("E004","N1","Full adoption on our own pipeline"),res("E004","63.2 ± 0.3 vs 58.0 ± 0.3"),know("k1","For this recipe, the curriculum pays mostly with a long schedule. Holds for this benchmark and model size; gain confirmed once on our own pipeline.","E002, P001, E004"),know("k2","A paper’s baseline may be undertuned, so its gain can include hyperparameters.","E003"),hyg("The paper’s comparison confounded its components with its hyperparameters. Not a cause of the gain, but a defect in how it was reported.")]},
+ {c:1,n:"s10",hops:["s5","s6","s7","g7","s8","s9","g8","oSev","s10"],t:"E004, on our own pipeline, written before the run: a gain of at least 4.0 over 58.0. Result: 63.2 ± 0.3, a gain of 5.2. So F001 has been seen, tested and used, and it closes. Store what holds, with its conditions.",
+  w:[run("E004","N1","Full adoption on our own pipeline"),res("E004","63.2 ± 0.3 vs 58.0 ± 0.3"),find("F001",null,"closed","used at step 10: closed"),know("k1","For this recipe, the curriculum pays mostly with a long schedule. Holds for this benchmark and model size; gain confirmed once on our own pipeline.","E002, P001, E004"),know("k2","A paper’s baseline may be undertuned, so its gain can include hyperparameters.","E003"),hyg("The paper’s comparison confounded its components with its hyperparameters. Not a cause of the gain, but a defect in how it was reported.")]},
  {c:1,n:"g9",a:"Yes: objective met.",t:"Every named contribution is measured, and the weights sum to the reproduced gain. Budget: 31 of 40 runs launched, 17 of 21 days.",w:[used(31,null,17)]},
  {c:1,n:"stop",t:"The report marks its interpretation: that the long schedule gives the curriculum steps to spend on hard examples is inferred. P001 shows where the gain falls, not why. F002 leaves as deferred. Across both examples, two drawn paths are still unexercised.",
   w:[find("F002",null,"deferred","deferred at Stop: the accounting did not need it")]},
@@ -900,7 +902,7 @@ function renderReadout(s) {
     top = `<div class="story"><span class="label">${esc(ex.cycles[e.c])} · what happens now</span>${e.a ? `<p class="answer">${esc(e.a)}</p>` : ""}<p>${esc(e.t)}</p>${writes}</div>`;
   } else {
     const occ = ex.trace.map((t, i) => (t.n === id || (t.hops || []).includes(id)) ? i : -1).filter((i) => i >= 0);
-    const list = occ.length ? `<div class="occ">${occ.map((i) => `<button type="button" data-jump="${i}">${esc(ex.cycles[ex.trace[i].c].split(",")[0])} · ${i + 1}</button>`).join("")}</div>` : `<p>This example never reaches it${id === "tree" ? " as a moment of its own: it is written and read throughout" : ""}.</p>`;
+    const list = occ.length ? `<div class="occ">${occ.map((i) => `<button type="button" data-jump="${i}">${esc(ex.cycles[ex.trace[i].c].split(",")[0])} · ${i + 1}</button>`).join("")}</div>` : `<p>This example never reaches it${id === "tree" ? " as a moment of its own: it is written and read throughout" : id === "ref" ? " as a moment of its own: the moment at “Answer questions” covers it" : ""}.</p>`;
     top = `<div class="story"><span class="label">Viewing this box. The walkthrough is paused at ${esc(NODES[e.n].tag.toLowerCase())}.</span>${occ.length ? "<p>Jump to a moment when it happens in this example:</p>" : ""}${list}<div><button type="button" id="backnow">Back to the current moment</button></div></div>`;
   }
   $("readout").innerHTML = `<div class="r-head"><span class="label">${esc(n.tag)}</span><span class="when ${n.when}">${WHEN[n.when]}</span><h2>${esc(n.name)}</h2></div>${top}${fieldsHTML(n)}`;
