@@ -90,7 +90,7 @@ button:hover, select:hover { border-color: var(--ink); }
 .mapnode.gate .sh { fill: var(--gate-bg); stroke: var(--gate-line); }
 .mapnode.out .sh { fill: var(--out-bg); stroke: var(--out-line); }
 .mapnode.stop .sh { fill: var(--stop-bg); stroke: var(--stop-line); }
-.mapnode.tree .sh { fill: var(--tree-bg); stroke: var(--tree-line); }
+.mapnode.tree .sh, .mapnode.loop .sh { fill: var(--tree-bg); stroke: var(--tree-line); }
 .mapnode.box .sh { fill: var(--box-bg); stroke: var(--step-line); }
 .mapnode .tt { font-size: 13px; font-weight: 600; }
 .mapnode.gate .tt, .mapnode.out .tt { font-size: 12px; font-weight: 500; }
@@ -119,7 +119,8 @@ button:hover, select:hover { border-color: var(--ink); }
 .el.recycle { fill: var(--recycle) !important; } .el.back { fill: var(--back) !important; } .el.newobj { fill: var(--new-obj) !important; } .el.read { fill: var(--read) !important; }
 #dot { fill: var(--ink); stroke: var(--panel); stroke-width: 2; pointer-events: none; }
 .pop { fill: var(--pop-line); stroke: var(--panel); stroke-width: 1.4; pointer-events: none; }
-.count { font: 500 11.5px var(--mono) !important; }
+.count { font: 500 10.5px var(--mono) !important; }
+.lr { font-size: 11.5px; } .lr.off { opacity: .45; }
 .count-n { font: 500 20px var(--mono) !important; font-variant-numeric: tabular-nums; }
 .map-foot { padding: 8px 12px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--rule); background: var(--panel); display: flex; flex-wrap: wrap; gap: 3px 16px; min-width: 760px; }
 .swatch { display: inline-block; width: 20px; height: 0; border-top: 2px solid; vertical-align: middle; margin-right: 5px; }
@@ -197,6 +198,10 @@ section { padding-block: 20px; }
 .know li { font-size: 13.5px; padding-block: 3px; }
 .know ul { margin: 0; padding-left: 17px; }
 .know .runs-of { font: 500 11px var(--mono); white-space: nowrap; }
+.rec-row { display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 2px 8px; font-size: 13px; padding-block: 5px; border-top: 1px solid var(--rule); }
+.rec-row:first-of-type { border-top: 0; padding-top: 0; }
+.rec-row .k { font: 500 11px/1.6 var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.rec-row .none { color: var(--muted); font-style: italic; }
 .fresh { animation: fresh 2.6s ease-out; }
 @keyframes fresh { 0%, 45% { background: var(--fresh); } 100% { background: transparent; } }
 
@@ -207,7 +212,7 @@ th { text-align: left; font: 500 11px/1.3 var(--mono); letter-spacing: .05em; te
 th, td { padding: 8px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
 tr:last-child td { border-bottom: 0; }
 td:first-child { font-weight: 600; white-space: nowrap; }
-.journey { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0; list-style: none; padding: 0; margin: 12px 0 0; counter-reset: j; }
+.journey { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; list-style: none; padding: 0; margin: 12px 0 0; counter-reset: j; }
 .journey li { padding: 9px 10px; border: 1px solid var(--rule); margin-left: -1px; background: var(--panel); font-size: 13px; min-width: 0; }
 .journey b { display: block; font-family: var(--display); font-size: 15px; }
 .journey .label { display: block; margin-block: 2px 5px; }
@@ -228,7 +233,7 @@ select { max-width: 100%; }
     <h1 style="margin-top:7px">Strong inference, one step at a time</h1>
     <p class="lead">Strong inference is a way to do research: write several rival explanations, design an experiment that rules some of them out, then repeat with what is left. Press Play to watch an invented ML project move through the workflow, and see what each step needs, does, produces and stores.</p>
   </div>
-  <p class="status"><b>An untested concept.</b> Nobody has run this workflow on a real problem. Every run and number in the walkthrough is invented, except the two facts marked (real). The “needs”, “outputs” and “stores” fields, and some “why here” text, are this page’s summary of the diagram and its explanation.</p>
+  <p class="status"><b>A concept with one real run behind it.</b> A harness built from an earlier draft of this workflow ran once on a real problem (name-that-llm, 2026-10-31 to 11-01). Three mechanisms were added from what that run showed: the loop record, the cause of a miss, and the branch gate with its Parked outcome. Every run and number in the walkthrough is still invented, except the two facts marked (real). The “needs”, “outputs” and “stores” fields, and some “why here” text, are this page’s summary of the diagram and its explanation.</p>
 </header>
 </div>
 
@@ -263,13 +268,13 @@ select { max-width: 100%; }
 <div class="wrap">
   <div class="bench">
     <div class="map-box">
-      <svg id="map" viewBox="0 -4 1030 650" role="group" aria-label="The cycle. Select any box to read about it."></svg>
+      <svg id="map" viewBox="0 -26 1030 676" role="group" aria-label="The cycle. Select any box to read about it."></svg>
       <div class="map-foot">
         <span><span class="swatch" style="border-color:var(--flow)"></span>Next step</span>
         <span><span class="swatch" style="border-color:var(--back)"></span>Back to an earlier step</span>
         <span><span class="swatch" style="border-color:var(--recycle)"></span>Recycle</span>
         <span><span class="swatch" style="border-color:var(--new-obj)"></span>New objective</span>
-        <span><span class="swatch" style="border-color:var(--read);border-top-style:dashed"></span>Read or write the tree</span>
+        <span><span class="swatch" style="border-color:var(--read);border-top-style:dashed"></span>Read or write the tree or the loop record</span>
         <span><span class="dotkey"></span>A Popper rule applies here</span>
       </div>
     </div>
@@ -295,6 +300,11 @@ select { max-width: 100%; }
           <div id="know"></div>
         </div>
         <div class="shelf">
+          <h3>Loop record</h3>
+          <p class="hint">How good the estimates were. Rebuilt at step 9 from the records and never edited by hand. Read at steps 3, 5 and 6. Not read for tuning before fifteen or twenty reviewed runs.</p>
+          <div id="rec"></div>
+        </div>
+        <div class="shelf">
           <h3>Findings</h3>
           <p class="hint">What nobody predicted. A finding suggests a question and supports nothing yet. Select a stage in its trail to jump there.</p>
           <div id="finds"></div>
@@ -311,7 +321,7 @@ select { max-width: 100%; }
   <section>
     <div class="sec-head">
       <h2>How knowledge is kept, and what limits it</h2>
-      <p>Each kind of record has a place where it is written and a place where it is read. All but the rescue log can also be undone.</p>
+      <p>Each kind of record has a place where it is written and a place where it is read. All but the rescue log and the loop record can also be undone, and those two are never edited by hand.</p>
     </div>
     <div class="tw"><table>
       <thead><tr><th>Record</th><th>What it says</th><th>Written</th><th>Read</th><th>What can undo it</th></tr></thead>
@@ -320,20 +330,25 @@ select { max-width: 100%; }
         <tr><td>Survivor</td><td>Best of this family, not proven. “None of the above” stays live.</td><td>Step 9</td><td>Step 10, where it must pass its own risky test</td><td>A failed use at step 10, or what the Stop report names as still able to refute it.</td></tr>
         <tr><td>Finding</td><td>Something no hypothesis predicted, with its size and run.</td><td>Step 8, kept at step 9</td><td>Step 3 every cycle, step 4 after a recycle</td><td>A decision with a reason: promote, defer or drop.</td></tr>
         <tr><td>Rescue log</td><td>A run was not clean. Its cause, and the declared auxiliary that was blamed.</td><td>The not-clean branch</td><td>Whenever a hypothesis keeps being saved</td><td>It does not go away. A hypothesis saved repeatedly is excluded.</td></tr>
+        <tr><td>Loop record</td><td>How good the researcher’s own estimates have been: gain ratio, misses with their cause, noise floor per family, rescues, cost ratio.</td><td>Step 9, recomputed from the records</td><td>Steps 3, 5 and 6, and the next project, whatever its problem</td><td>Nothing edits it. It changes only when the records under it change.</td></tr>
         <tr><td>Project knowledge</td><td>What holds, the runs behind it, and the conditions they ran under.</td><td>Step 10</td><td>Step 2 of the next project</td><td>The same rule as exclusions: it holds under its conditions.</td></tr>
       </tbody>
     </table></div>
+    <h3 style="margin-top:20px">Two kinds of knowledge, and a limit on a branch</h3>
+    <p style="margin-top:8px;max-width:80ch">The tree holds two kinds. <b>Problem knowledge</b> says what is true of the problem: exclusions, findings, what holds. The <b>loop record</b> says how good the researcher’s own estimates have been: the expected gain of a question, the size of a prediction, a noise floor, a cost. It is derived, so it is never stale and nobody can tune it, and it outlives the problem, because the next project uses the same instrument. With few runs it holds anecdotes, not ratios, so nothing is tuned on it before fifteen or twenty reviewed runs. A discount can also over-correct until no question seems to reach the objective; the “really trying” rule at the objective gate guards against that.</p>
+    <p style="margin-top:8px;max-width:80ch">A recycle can repeat without end: a branch can add rivals as fast as it excludes them, or keep spending on a gain that does not arrive. So the red recycle edge carries the <b>branch gate</b>. It shows three numbers for every open question: rivals added against excluded over the last three runs, realized against predicted gain, and the budget used. Yes sends the cycle back to step 4. No sends the branch to <b>Parked</b>: the best answer is written, the standing rivals are marked untested (never excluded), and the cycle returns to step 3 for another question. Parking is not abandoning, and a parked branch is reopened only by a new finding that bears on it. A free step also cannot block a paid one: a planned analysis that fails is retried once, and dropped with a note if it fails twice. The thresholds are first guesses and are not tuned.</p>
     <h3 style="margin-top:20px">The life of a finding</h3>
     <ol class="journey">
       <li><b>Seen</b><span class="label">Step 8 · open</span>The standing checks show it. It is written with its size and run.</li>
       <li><b>Kept</b><span class="label">Step 9 · open</span>It is recorded, whatever the gates decide about the hypotheses.</li>
       <li><b>Reopened</b><span class="label">Any time · open</span>Changed conditions turn an old exclusion into a new finding.</li>
-      <li><b>Decided</b><span class="label">Step 3 · 3 ways</span>Repeats and needed: promote. Repeats, not needed: defer. Does not repeat: drop.</li>
+      <li><b>Decided</b><span class="label">Step 3 · 3 ways</span>Repeats and needed: promote. Repeats, not needed: defer. Does not repeat: drop. A miss measured here needs no repeat.</li>
       <li><b>Tested</b><span class="label">Steps 4 to 7 · promoted</span>It becomes a how or why question with rivals and a new experiment.</li>
       <li><b>Used</b><span class="label">Step 10 · closed</span>The surviving explanation changes something, and the change is measured.</li>
+      <li><b>Repeated</b><span class="label">Step 9, then step 3 · open</span>A miss cause seen three times in the last five misses is logged as a finding about the protocol, then follows the same path.</li>
       <li><b>Reported</b><span class="label">Stop · unchanged</span>Every finding is listed with its status, so stopping cannot lose one.</li>
     </ol>
-    <p style="margin-top:12px;max-width:80ch">Three obligations hold this together: step 9 needs a findings entry, even if empty; step 3 needs a decision on each open finding; Stop needs every finding’s status. These are rules of the method. For now they rest on the researcher’s discipline, and nothing checks them.</p>
+    <p style="margin-top:12px;max-width:80ch">A repeated miss cause is how a repeated miss changes a protocol: it is decided at step 3, promoted into a how or why question about the measurement, tested and used. The count of three in five is a first guess and is not tuned. Three obligations hold this together: step 9 needs a findings entry, even if empty; step 3 needs a decision on each open finding; Stop needs every finding’s status. These are rules of the method. For now they rest on the researcher’s discipline, and nothing checks them.</p>
   </section>
 
   <section class="two">
@@ -349,28 +364,31 @@ select { max-width: 100%; }
           <tr><td>Railsback</td><td>“None of the above” as a placeholder, and untested is not excluded.</td></tr>
           <tr><td>Lakatos, Mayo, Meehl</td><td>Repeated rescue degenerates; severity; a direction alone risks little. Their notes rest on summaries, one posted section and memory, not on a primary text.</td></tr>
           <tr><td>This workflow</td><td>Steps 8 and 10, the path of a finding, and the rule for reopening exclusions. No source has these; the explanation marks them as inference.</td></tr>
+          <tr><td>The loop record</td><td>Estimates carry a record of how they fared, derived and never edited. Inference from the first real run of the harness (name-that-llm, 2026-10-31 to 11-01), whose records showed an expected gain over-estimated by about 2.5 times, twice, and predictions set from sources measured under other conditions.</td></tr>
+          <tr><td>The cause of a miss</td><td>Each missed prediction gets a cause from a fixed list of six, and a cause that repeats is a finding about the protocol. Inference from the same run, whose records showed refutations by margins under the noise floor.</td></tr>
+          <tr><td>The branch gate and Parked</td><td>A branch that degenerates is parked, not abandoned, and a failed free step no longer blocks a paid one. Inference from the same run: a why-tree of 13 rivals built on other people’s numbers, and about $12 spent over two iterations waiting on an analysis that had failed. That a programme may recover is Lakatos’s point.</td></tr>
         </tbody>
       </table></div>
     </div>
     <div>
-      <div class="sec-head"><h2>Left out on purpose</h2><p>These wait until a first working skeleton shows a need.</p></div>
+      <div class="sec-head"><h2>Left out on purpose</h2><p>These wait until more real runs show a need.</p></div>
       <ul class="plain">
         <li>Independent checking: who runs, who judges, who sees what</li>
         <li>Reusing data across cycles, which can overfit even a holdout set</li>
-        <li>Making sure rival hypotheses really differ</li>
-        <li>Choosing what is worth doing next, by value and cost</li>
-        <li>Whether the measure captures the objective</li>
+        <li>Diverse hypotheses: step 4 marks each pair exclusive or compound, but nothing verifies that rivals really differ</li>
+        <li>Choosing what is worth doing, beyond the first version: step 3 shows gain and cost corrected by the loop record; discounting gain per source and priors by lever type are open</li>
+        <li>Whether the measure captures the objective. A public score is still only a stand-in for the final one</li>
         <li>Whether all these rules pay for their cost</li>
-        <li>Thresholds: how many hypotheses, seeds or checks are enough</li>
+        <li>Thresholds and quantities: three misses in five, a quarter of predicted gain and half of the remaining budget are not tuned, and parked branches are not reopened automatically. Both wait for fifteen or twenty reviewed runs. Which standing checks earn their place is also open</li>
         <li>Recording pruned hypotheses</li>
-        <li>Rivals that predict the same thing, which only step 6’s outcome table can catch</li>
+        <li>Rivals that predict the same thing: step 4’s marking and step 6’s outcome table should expose them, but both are the researcher’s declaration</li>
         <li>Three reasons to stop sharing one gate: success, an empty budget and a wrong objective</li>
         <li>Outside criticism and independent replication</li>
       </ul>
     </div>
   </section>
 
-  <footer>Built from <span class="mono">strong_inference_workflow.drawio</span>, <span class="mono">workflow_explanation.md</span>, <span class="mono">applied_example.md</span> and <span class="mono">applied_example_2.md</span> at commit <span class="mono">294b092</span>. Neither example reaches “Several rivals, or undecided”, or step 8’s edge back to “Know the field”, so those two paths never light up. The walkthrough also leaves two things dark on purpose: “Refine questions” and its edges, because the moment at “Answer questions” covers the refining, and the green tree edges, because the tree is read and written throughout.</footer>
+  <footer>Built from <span class="mono">strong_inference_workflow.drawio</span>, <span class="mono">workflow_explanation.md</span>, <span class="mono">applied_example.md</span>, <span class="mono">applied_example_2.md</span> and <span class="mono">applied_example_3.md</span> at commit <span class="mono">a08d12e</span>. Neither example reaches “Several rivals, or undecided”, or step 8’s edge back to “Know the field”, so those two paths never light up. Example 1 never reaches the branch gate and example 2 answers it Yes once, so nobody is ever Parked here; <span class="mono">applied_example_3.md</span> walks a branch to Parked, and this page does not trace it. The walkthrough also leaves two things dark on purpose: “Refine questions” and its edges, because the moment at “Answer questions” covers the refining, and the green tree edges, because the tree is read and written throughout.</footer>
 </div>
 
 <script>
@@ -415,38 +433,38 @@ const NODES = {
     why:"The loop may run several times before moving on. The walkthrough does not stop at this box: the moment at “Answer questions” covers the refining too.",
     src:"Part of the know-the-field loop, which as a whole is Jewett’s exploratory and pilot phase."},
   s3: {kind:"step", x:490,y:50,w:130,h:70, tt:["3. Pick a question","and decide open","findings first"], tag:"Step 3", name:"Pick a question", when:"before",
-    needs:"Open findings, read from the tree. What is unanswered or puzzling.",
-    does:"First decide each open finding: promote if it repeats on new data, defer or drop, with a reason. Then pick from what is unanswered or puzzling.",
-    outputs:"A candidate question for the gate.",
+    needs:"Open findings, read from the tree. The loop record, read by the green edge: the running gain ratio and the cost ratio. What is unanswered or puzzling.",
+    does:"First decide each open finding: promote if it repeats on new data, defer or drop, with a reason. A miss measured in this project is promoted or deferred at once, without a repeat. Then pick from what is unanswered or puzzling. Each candidate is shown with its expected gain discounted by the running gain ratio, and its cost corrected by the cost ratio. A puzzle (a surprise measured here, its local explanandum) gets rivals and its own branch budget: runs, hours or money, and a closing rule; no branch may take more than half of what remains while another open question reaches as far. A lever (does X gain at least Y here, at what cost?) gets one hypothesis.",
+    outputs:"A candidate question, with its kind and, for a puzzle, its branch budget, for the gate.",
     stores:"Each finding’s new status and its reason.",
-    why:"Findings are decided first, so one logged at step 8 cannot pass through a cycle unseen.",
-    src:"Fudge: only puzzling observations have value, because they signal the current explanation may be wrong."},
+    why:"Findings are decided first, so one logged at step 8 cannot pass through a cycle unseen. The loop record is read here so a question’s promised gain is shown at what past promises were worth.",
+    src:"Fudge: only puzzling observations have value, because they signal the current explanation may be wrong. The kinds, the budget and the discount are inference from the first real run."},
   g3: {kind:"gate", cx:720,cy:85,w:130,h:90, tt:["How or why, and","serves objective?"], tag:"Gate", name:"How or why question that serves the objective?", when:"before",
     needs:"The candidate question and the objective.",
-    does:"Reject “what is the effect of x on y”: that needs a measurement, not a method. The question must also be specific enough that alternatives can be stated.",
+    does:"Reject “what is the effect of x on y”: that needs a measurement, not a method. The question must also be specific enough that alternatives can be stated. It also sorts the kind. A why question whose explanandum is other people’s numbers under other conditions is a reading question, and goes back to the loop.",
     outputs:"Yes: go to step 4. No: back to the know-the-field loop.",
-    stores:"A question that passes becomes a node of the tree.",
+    stores:"A question that passes becomes a node of the tree, with its kind and branch budget.",
     why:"It blocks effort on a question that cannot exclude anything.",
     src:"Fudge. O’Donohue and Buchanan’s objection on specificity."},
   s4: {kind:"step", x:660,y:150,w:320,h:78, tt:["4. Write the family of hypotheses, prune"], tag:"Step 4", name:"Write the family of hypotheses, then prune to a handful", when:"before",
     needs:"The question. Findings too, because a recycle lands here and skips step 3. The new facts from the last round.",
-    does:"Bring every rational explanation into view at once, with combinations and the placeholder “None of the above”. Keep about five. Each must answer the question and forbid some outcome. Prefer the bold one that says more.",
+    does:"Bring every rational explanation into view at once, with combinations and the placeholder “None of the above”. Keep about five. Mark each pair of rivals exclusive (an outcome kills one and spares the other) or compound (both can hold in part), and count compound rivals once. A variant at another threshold is a prediction under a rival, not a rival. Each must answer the question and forbid some outcome. Prefer the bold one that says more. A lever question gets one hypothesis and the placeholder.",
     outputs:"A handful of rival hypotheses.",
     stores:"The node’s live hypotheses. Pruned claims are not recorded in the tree.",
     why:"Several at once, so that no single explanation captures the investigator’s affection. This is invention: nothing is measured here.",
     src:"Chamberlin. Railsback’s none of the above. Szilard’s count. Fudge’s gate.",
     popper:"A good hypothesis forbids outcomes; prefer the bold hypothesis with more content."},
   s5: {kind:"step", x:660,y:240,w:320,h:78, tt:["5. For each hypothesis, derive predictions"], tag:"Step 5", name:"For each hypothesis, derive the predictions it makes", when:"before",
-    needs:"The hypotheses, and what the pilot says is expected anyway.",
-    does:"Keep only risky predictions: ones the hypothesis cannot survive being wrong about, that would not be expected without it, and that state a size and a condition, not only a direction.",
+    needs:"The hypotheses, and what the pilot says is expected anyway. The misses row of the loop record.",
+    does:"Keep only risky predictions: ones the hypothesis cannot survive being wrong about, that would not be expected without it, and that state a size and a condition, not only a direction. A size is not set tighter than past misses allow.",
     outputs:"One row of predictions per hypothesis. The placeholder has none.",
     stores:"The predictions, written beside their hypotheses.",
     why:"They come before the design because the experiment has to separate them. Step 10 also returns here, since a use is a new prediction.",
     src:"Fudge’s critical prediction. Popper’s risky prediction. Meehl: a direction alone is barely risky.",
     popper:"Confirmations count only when they came from a risky prediction."},
   s6: {kind:"step", x:660,y:330,w:320,h:56, tt:["6. Design the crucial experiment"], tag:"Step 6", name:"Design the crucial experiment", when:"before",
-    needs:"The predictions. On a return from the not-clean gate, the cause of the failure.",
-    does:"Write which hypotheses each outcome excludes, what counts as a refutation (effect size, seeds, power), which auxiliary assumptions may be blamed, and the controls. It must be informative either way.",
+    needs:"The predictions. The loop record: the noise floor of the model family under test, and the misses row. On a return from the not-clean gate, the cause of the failure.",
+    does:"Write what each outcome does (excludes, corroborates or leaves undecided) and which hypotheses it excludes, what counts as a refutation (effect size, seeds, power), which auxiliary assumptions may be blamed, and the controls. Every outcome is mapped and at least one excludes; an outcome that excludes nothing is written as such, never dressed as an exclusion, and an experiment none of whose outcomes excludes is not run. Seeds and the decision rule read the family’s noise floor, and the misses row says which auxiliaries to declare.",
     outputs:"An outcome-to-exclusion table and a decision rule.",
     stores:"The design, in the notebook, before anything runs.",
     why:"Writing all this before the run stops the result from choosing its own explanation. This is the last moment anything can be decided freely.",
@@ -476,11 +494,11 @@ const NODES = {
     src:"Not in the sources. Closest is Fudge’s “sensitivity” at Observe. Marked as inference."},
   s9: {kind:"step", x:330,y:420,w:120,h:56, tt:["9. Record","the results"], tag:"Step 9", name:"Record the results", when:"after",
     needs:"The result, the outcome table from step 6, and the findings from step 8.",
-    does:"Write excluded, surviving, undecided, which run decided, and how severe: would the test have failed the hypothesis had it been false?",
-    outputs:"The record the next gate decides on.",
-    stores:"All of it, to the tree, including the findings, even if none.",
+    does:"Write excluded, surviving, undecided, which run decided, and how severe: would the test have failed the hypothesis had it been false? For each prediction missed, write its cause from a fixed list of six, with one sentence of support: source-conditions, regime-offset, noise, auxiliary, hypothesis, or unknown (an open finding). Then recompute the loop record.",
+    outputs:"The record the next gate decides on, and the rebuilt loop record.",
+    stores:"All of it, to the tree, including the findings, even if none. The loop record is derived, so it is rebuilt here and never edited by hand.",
     why:"An empty findings entry shows the analysis was done; a missing one does not. Any conclusion that is not an exclusion is insecure.",
-    src:"Platt on exclusions. Popper on severity, Mayo for the definition.",
+    src:"Platt on exclusions. Popper on severity, Mayo for the definition. The cause of a miss and the loop record are inference from the first real run.",
     popper:"Surviving a severe test corroborates, it never proves."},
   g8: {kind:"gate", cx:245,cy:448,w:120,h:84, tt:["What","survives?"], tag:"Gate", name:"What survives?", when:"after",
     needs:"The record from step 9.",
@@ -507,14 +525,14 @@ const NODES = {
   oRiv: {kind:"out", x:455,y:530,w:135,h:62, tt:["Several rivals,","or undecided"], tag:"Outcome", name:"Several rivals, or undecided", when:"after",
     needs:"A clean but inconclusive result: the rivals are all still alive.",
     does:"Plan a new crucial experiment, with more power, or sub-hypotheses.",
-    outputs:"The red edge back to step 4.",
+    outputs:"The red edge to the branch gate. Yes: back to step 4. No: Parked.",
     stores:"The undecided status, already in the record.",
     why:"This is Platt’s recycle step. Neither example reaches it, so it never lights up in the walkthrough.",
     src:"Platt."},
   oNone: {kind:"out", x:600,y:530,w:135,h:62, tt:["None: the family","was incomplete"], tag:"Outcome", name:"None: the family was incomplete", when:"after",
     needs:"Every hypothesis excluded.",
     does:"Add new hypotheses, using the new facts.",
-    outputs:"The red edge back to step 4. The question stays in place.",
+    outputs:"The red edge to the branch gate. If Yes, back to step 4 with the question in place.",
     stores:"The exclusions stay. The new facts carry over.",
     why:"“None of the above” has come true. That is a result. It tells you the family was too small.",
     src:"Railsback."},
@@ -540,13 +558,34 @@ const NODES = {
     why:"Marking interpretation matters because a measurement can be checked against its run, while an explanation of it can go further than the run shows.",
     src:"Popper on tentative survivors. The rest is inference.",
     popper:"A survivor is held tentatively, and the report says what would end its tenure."},
-  tree: {kind:"tree", x:195,y:205,w:350,h:195, tag:"Store", name:"Logical tree + notebook", when:"all",
+  tree: {kind:"tree", x:190,y:205,w:290,h:195, tag:"Store", name:"Logical tree + notebook", when:"all",
     needs:"Writes from step 9, and from the steps that log findings and project knowledge.",
-    does:"Hold the accumulated knowledge. A node is a question with its live hypotheses. An edge is a crucial experiment, and the outcome picks the branch.",
+    does:"Hold the accumulated knowledge about the problem. A node is a question with its live hypotheses. An edge is a crucial experiment, and the outcome picks the branch. The loop record sits beside it.",
     outputs:"Read at step 2 (what is known) and at steps 3 and 4 (findings).",
     stores:"Excluded hypotheses, with their runs. Untested ones, kept visible. Findings, with status and reason. Project knowledge.",
     why:"It outlives every cycle. An exclusion holds under its conditions: if they change, it is reopened as a finding.",
     src:"Platt’s notebook and tree. In a repository, a set of markdown files (inference from the synthesis)."},
+  loop: {kind:"loop", x:495,y:205,w:125,h:185, tag:"Store", name:"Loop record", when:"all",
+    needs:"Step 9 writes it, and nothing else. It is recomputed from fields that already exist: the gain written at step 0 or 3 and measured at step 10, the misses and their causes from step 9, the repeats of every run from step 7, the not-clean reruns, and the cost written at step 6 against the cost at step 7.",
+    does:"Hold five rows on how good the researcher’s own estimates have been: gain ratio (realized over predicted, per closed question, and its running median), misses (each signed miss, with its cause), noise floor per family of models, rescues per hypothesis, and cost ratio (actual over expected). It is derived and never edited by hand, so it is never stale and nobody can tune it.",
+    outputs:"Read at step 3 (expected gain discounted, cost corrected, drawn by the green edge), at step 5 (widths of predicted sizes) and at step 6 (seeds, decision rule, auxiliaries to declare).",
+    stores:"The five rows. It is reported at Stop with the problem knowledge, and it outlives the objective and the problem: the next project starts from it, because the instrument is the same.",
+    why:"Problem knowledge says what is true of the problem. This says how good the estimates are. With few runs it holds anecdotes, not ratios, so nothing is tuned on it before fifteen or twenty reviewed runs. A discount can also over-correct; the “really trying” rule at the objective gate guards against that.",
+    src:"Not in the sources. Inference from the first real run of the harness (name-that-llm, 2026-10-31 to 11-01), where an expected gain was over-estimated by about 2.5 times, twice."},
+  gB: {kind:"gate", cx:905,cy:85,w:120,h:80, tt:["Branch","progressing?"], tag:"Gate", name:"Branch progressing?", when:"after",
+    needs:"The tree and the loop record, rendered for every open question at every cycle: rivals added against rivals excluded over the last three runs on this question; realized against predicted gain; the budget this branch has used.",
+    does:"Ask whether the branch is degenerating. It is when rivals added exceed rivals excluded over the last three runs, or realized gain is under a quarter of predicted after two runs, or the budget is spent. Yes when none of these holds.",
+    outputs:"Yes: back to step 4 on the same question. No: the branch is Parked.",
+    stores:"Nothing on Yes. On No the Parked box writes the status.",
+    why:"A recycle can repeat without end: a branch can add rivals as fast as it excludes them, or keep spending on a gain that does not arrive. A person sees the three numbers, so the gate is not a silent rule. The three limits are first guesses and are not tuned.",
+    src:"Inference from the first real run (name-that-llm, 2026-10-31 to 11-01): a why-tree of 13 rivals built on other people’s numbers, and about $12 spent over two iterations waiting on an analysis that had failed."},
+  oPark: {kind:"out", x:845,y:-20,w:120,h:40, tt:["Parked: rivals","kept untested"], tag:"Outcome", name:"Parked", when:"after",
+    needs:"A No from the branch gate.",
+    does:"Write the current best answer, mark the standing rivals untested (never excluded), set the branch’s status to parked, and return to step 3 to pick another open question. A parked branch is reopened only by a new finding that bears on it.",
+    outputs:"The red recycle ends here: the cycle goes back to step 3, not step 4.",
+    stores:"The branch status parked, the best answer, and the rivals marked untested. The tree keeps everything.",
+    why:"Parking is not abandoning. A programme that degenerates today may recover, so the tree keeps everything and only the loop moves its budget. A planned analysis that fails twice is dropped with a note, so a free step cannot block a paid one.",
+    src:"Lakatos on degenerating programmes (his note rests on an encyclopedia summary). The outcome itself is inference from the first real run. This page never reaches it: applied_example_3.md walks a branch to Parked."},
 };
 const KNOW = ["s1","s2","ans","ref"];
 
@@ -555,17 +594,20 @@ const EDGES = [
   ["s0>know","M150 71H175","flow"],
   ["s1>s2","M247 98V120","flow"],["s2>ans","M307 143H325","flow"],["ans>ref","M384 120V98","flow"],["ref>s1","M325 75H307","flow"],
   ["know>s3","M455 85H490","flow"],["s3>g3","M620 85H655","flow"],
-  ["g3>know","M720 40V12H315V28","back",{x:580,y:26,t:"No: not yet a good question",a:"middle"}],
+  ["g3>know","M720 40V12H315V28","back",{x:400,y:24,t:"No: not yet a good question",a:"middle"}],
   ["g3>s4","M720 130V150","flow",{x:728,y:145,t:"Yes"}],
   ["s4>s5","M820 228V240","flow"],["s5>s6","M820 318V330","flow"],["s6>s7","M890 386V420","flow"],
   ["s7>g7","M800 448H755","flow"],
   ["g7>s6","M690 409V386","back",{x:698,y:405,t:"No: fix, log the rescue"}],
   ["g7>s8","M625 448H600","flow",{x:603,y:441,t:"Yes"}],
   ["s8>s9","M480 448H450","flow"],["s9>g8","M330 448H305","flow"],
-  ["s8>know","M595 420V408H628V194H440V178","back",{x:622,y:300,t:"finding shows",a:"end"},{x:622,y:313,t:"a gap in",a:"end"},{x:622,y:326,t:"knowledge",a:"end"}],
+  ["s8>know","M595 420V408H628V194H440V178","back",{x:640,y:300,t:"a finding shows a gap in knowledge",a:"middle",r:1}],
   ["g8>oOne","M245 490V510H232V530","flow"],["g8>oSev","M245 490V510H377V530","flow"],["g8>oRiv","M245 490V510H522V530","flow"],["g8>oNone","M245 490V510H667V530","flow"],
-  ["oRiv>s4","M522 592V612H1003V189H980","recycle",{x:800,y:607,t:"Recycle: back to step 4",a:"middle"}],
-  ["oNone>s4","M667 592V612H1003V189H980","recycle"],
+  ["oRiv>gB","M522 592V612H1003V85H965","recycle",{x:800,y:607,t:"Recycle: through the branch gate",a:"middle"}],
+  ["oNone>gB","M667 592V612H1003V85H965","recycle"],
+  ["gB>s4","M905 125V150","recycle",{x:897,y:135,t:"Yes",a:"end"}],
+  ["gB>oPark","M905 45V20","flow",{x:913,y:36,t:"No"}],
+  ["oPark>s3","M845 0H590V50","back",{x:835,y:-6,t:"Parked: pick another question",a:"end"}],
   ["oOne>s10","M165 561H150","flow"],["oSev>s10","M377 592V604H110V596","flow"],
   ["s10>s5","M50 596V632H1017V279H980","recycle",{x:500,y:627,t:"Not yet measured: a new prediction and experiment",a:"middle"}],
   ["s10>g9","M85 530V491","flow",{x:93,y:515,t:"Measured"}],
@@ -573,8 +615,10 @@ const EDGES = [
   ["g9>s3","M150 448H172V186H555V120","back",{x:178,y:198,t:"No: next sub-question"}],
   ["stop>s0","M55 270V102","newobj",{x:62,y:178,t:"New or revised"},{x:62,y:191,t:"objective"}],
   ["tree>know","M340 205V178","read",{x:346,y:200,t:"read at step 2"}],
-  ["tree>s3","M530 205V120","read",{x:524,y:150,t:"read: findings",a:"end"}],
+  ["tree>s3","M470 213V135H508V120","read",{x:476,y:168,t:"findings"}],
+  ["loop>s3","M590 207V120","read",{x:598,y:160,t:"read"}],
   ["s9>tree","M390 420V400","read",{x:396,y:414,t:"write"}],
+  ["s9>loop","M440 420V408H565V390","read",{x:505,y:404,t:"write"}],
 ];
 
 /* ---------- Helpers that describe what a moment writes ---------- */
@@ -591,6 +635,8 @@ const find = (id, text, status, say) => ({op:"find", id, text, status, say});
 const rescue = (text) => ({op:"rescue", text});
 const hyg = (text) => ({op:"hyg", text});
 const know = (id, text, by) => ({op:"know", id, text, by});
+const rec = (row, text) => ({op:"rec", row, text});
+const REC = [["gain","Gain ratio"],["miss","Misses"],["floor","Noise floor"],["rescue","Rescues"],["cost","Cost ratio"]], RECN = Object.fromEntries(REC);
 
 /* ---------- Example 1 ---------- */
 const EX1 = {cycles:["Cycle 1","Cycle 2","Cycle 3, new objective"], trace:[
@@ -601,97 +647,104 @@ const EX1 = {cycles:["Cycle 1","Cycle 2","Cycle 3, new objective"], trace:[
  {c:0,n:"ans",t:"The seed question is answered: the gap is real. The test set’s author mix stays unknown. A new question appears: do the submission notebooks train on the same data as the local runs? A puzzle is on the table, so the loop ends."},
  {c:0,n:"s3",t:"First attempt: “What is the public score of the baseline with better features?”"},
  {c:0,n:"g3",a:"No, back to the loop.",t:"That is a what question. Submitting answers it, and it does not explain the gap."},
- {c:0,n:"s3",hops:["know","s3"],t:"Second attempt: “Why does a local estimate of 0.69 become a public score of 0.42 for the same model?”"},
- {c:0,n:"g3",a:"Yes.",t:"A why question, it serves the objective directly, and alternatives can be stated.",
+ {c:0,n:"s3",hops:["know","s3"],t:"Second attempt: “Why does a local estimate of 0.69 become a public score of 0.42 for the same model?” Kind: a puzzle, because the surprise was measured here, in the 0.27 gap between the pilot’s 0.69 and the first public 0.42. Branch budget, written now: four of the eight runs and one submission. The loop record is empty, so there is no gain or cost ratio to correct by."},
+ {c:0,n:"g3",a:"Yes.",t:"A why question, it serves the objective directly, and alternatives can be stated. Its explanandum is local, so it gets a family of rivals.",
   w:[node("N1","Why does a local estimate of 0.69 become a public score of 0.42?")]},
- {c:0,n:"s4",t:"Four explanations and a placeholder, written before any new run. “The public set is noisy” is pruned: any score fits it, so it forbids nothing. “The model overfits” is too vague to forbid anything.",
+ {c:0,n:"s4",t:"Four explanations and a placeholder, written before any new run. “The public set is noisy” is pruned: any score fits it, so it forbids nothing. “The model overfits” is too vague to forbid anything. Rival pairs are marked: H004 is the compound of H001 to H003, and the other pairs are exclusive, since an outcome of one test can kill one and spare another.",
   w:[hyp("H001","N1","Prompt leakage: same prompts in train and validation folds"),hyp("H002","N1","Training-data drift: notebooks use later dataset versions"),hyp("H003","N1","Class prior shift in the public test set"),hyp("H004","N1","Several at once, each part of the gap"),none("N1")]},
  {c:0,n:"s5",t:"Each prediction states a size. H001 expects a drop of at least 0.15 under a split grouped by prompt id, when nothing on the old protocol moves by more than 0.01. The placeholder predicts nothing.",
   w:[pred("H001","Grouped split drops the estimate ≥ 0.15"),pred("H002","Pinned versions change the estimate ≥ 0.05"),pred("H003","Majority-class probe ≥ 0.10 from training frequency"),pred("H004","Each move ≥ 0.03, none ≥ 0.20")]},
- {c:0,n:"s6",t:"Three tests, and a table saying what each outcome excludes. Declared auxiliaries: the prompt column may be wrong, the local data may not match the manifest, the metric may not be accuracy. Nothing else may be blamed afterwards.",
+ {c:0,n:"s6",t:"Three tests, and a table saying what each outcome excludes. Declared auxiliaries: the prompt column may be wrong, the local data may not match the manifest, the metric may not be accuracy. Nothing else may be blamed afterwards. Every outcome is mapped to what it does, and at least one excludes a hypothesis, so the check passes.",
   w:[run("E001","N1","Grouped five-fold split by prompt id, three seeds"),run("E002","N1","Verify data, rerun on pinned versions, three seeds"),run("P001","N1","One submission predicting the majority class")]},
  {c:0,n:"s7",fail:1,t:"E002 goes first, because it is cheapest. The data check fails on three datasets. The local files are not the pinned versions, so the run stops before training."},
  {c:0,n:"g7",a:"No, not clean.",fail:1,t:"The test cannot be interpreted until the data matches the manifest. No exclusion is recorded."},
  {c:0,n:"s6",fail:1,t:"The stale local copy was declared at step 6, so it may be blamed. Fetch the pinned versions, then the check passes.",
-  w:[rescue("Entry 1: E002 aborted. Blamed: stale local copy, declared at step 6. Fix: fetch pinned versions. No exclusion recorded.")]},
+  w:[rescue("Entry 1: E002 aborted. Blamed: stale local copy, declared at step 6. Fix: fetch pinned versions. No exclusion recorded."),rec("rescue","E002: 1 (stale data, under H002). Every other hypothesis: 0.")]},
  {c:0,n:"s7",t:"E002: 0.68 ± 0.01, a change of 0.01. E001: 0.46 ± 0.02, a drop of 0.23. P001 scores 0.19 against a training frequency of 0.21.",
-  w:[res("E002","0.68 ± 0.01, change 0.01"),res("E001","0.46 ± 0.02, drop 0.23"),res("P001","0.19 public vs 0.21 training frequency")]},
+  w:[res("E002","0.68 ± 0.01, change 0.01"),res("E001","0.46 ± 0.02, drop 0.23"),res("P001","0.19 public vs 0.21 training frequency"),rec("floor","Baseline: ±0.01 on three seeds, stratified split.")]},
  {c:0,n:"g7",a:"Yes, clean.",t:"Clean on all three. P001 is clean on the metric but its noise is unknown, so its verdict is provisional until cycle 2 measures it."},
  {c:0,n:"s8",t:"The standing checks run on E001. No hypothesis says anything about them. They show something nobody predicted: 58% of errors confuse a model with another of the same family. It describes this data and supports nothing yet.",
   w:[find("F001","58% of errors confuse a model with a sibling in its family. About 15% would be expected if spread evenly. Source: E001.","open","seen at step 8")]},
- {c:0,n:"s9",t:"E002 excludes H002 (severity high). E001 ends H003 as a sole cause and breaks H004’s “none ≥ 0.20” clause (high). P001 excludes H003, provisionally (medium). Drift did not cause the gap, but it is a real defect, so it is logged apart.",
-  w:[set("H002","excluded","E002"),set("H003","excluded","P001, provisional"),set("H004","excluded","E001"),hyg("Dataset drift: not the cause of the gap, but a defect in the pipeline. Found by E002.")]},
+ {c:0,n:"s9",t:"E002 excludes H002 (severity high). E001 ends H003 as a sole cause and breaks H004’s “none ≥ 0.20” clause (high). P001 excludes H003, provisionally (medium). Drift did not cause the gap, but it is a real defect, so it is logged apart. Three predictions were missed (H002’s, H003’s and H004’s), each with cause hypothesis: ordinary refutations, which teach nothing about the process.",
+  w:[set("H002","excluded","E002"),set("H003","excluded","P001, provisional"),set("H004","excluded","E001"),hyg("Dataset drift: not the cause of the gap, but a defect in the pipeline. Found by E002."),
+     rec("gain","— (the objective is a protocol, so no gain was predicted)."),rec("miss","No process miss yet. 3 refutations (H002, H003, H004), cause hypothesis."),rec("cost","3 training runs against 3 planned, so 1.0. Branch budget: 3 of 4 runs, 1 of 1 submission. Hours and money: not logged.")]},
  {c:0,n:"g8",a:"One: H001.",t:"H004 fell to E001’s size: one drop of 0.23, which the combination said could not happen. The placeholder stays live. A retest is written now: a local estimate within 0.03 of the public score."},
  {c:0,n:"oOne",t:"Best of this family, not proven. E001’s predicted drop was one risky test. The retest on new models is the harder one, and it is still owed.",w:[set("H001","corroborated","E001")]},
- {c:0,n:"s10",t:"Apply: every later comparison uses the grouped split. Measure: 0.46 misses the known 0.42 by 0.04, outside the allowed 0.03. So H001 explains most of the gap, not all. Store: nothing yet. One corroboration with a retest pending is not project knowledge."},
+ {c:0,n:"s10",t:"Apply: every later comparison uses the grouped split. Measure: 0.46 misses the known 0.42 by 0.04, outside the allowed 0.03. So H001 explains most of the gap, not all. Store: nothing yet. One corroboration with a retest pending is not project knowledge. Miss recorded: the retest predicted a difference within 0.03 and it is 0.04 off, cause unknown, so it is also logged as finding F005, open.",
+  w:[rec("miss","1 process miss: H001’s retest, −0.04 against ±0.03, cause unknown (open as F005). Apart from it, 3 refutations (H002, H003, H004), cause hypothesis."),find("F005","The grouped estimate of 0.46 sits 0.04 above the public score of 0.42, outside the ±0.03 H001’s retest allowed. Cause unknown. Source: the retest of H001.","open","seen at step 10: the retest missed")]},
  {c:0,n:"g9",a:"No, back to step 3.",t:"No submission has met the criterion yet. Budget used so far: 3 of 8 runs, 1 of 3 submissions, 4 of 14 days.",w:[used(3,1,4)]},
 
- {c:1,n:"s3",t:"Open findings first. F001 is deferred: it concerns what the model gets wrong, and this objective concerns whether the estimate predicts the score. Then a first attempt: “Which feature carries the prompt signal?”",
-  w:[find("F001",null,"deferred","deferred at step 3: this objective does not need it")]},
- {c:1,n:"g3",a:"No, back to the loop.",t:"A how question, but it explains the model, while the objective asks about the estimate. The grouped split removes the leakage whichever feature carries it."},
+ {c:1,n:"s3",t:"Open findings first: F001 and F005. F005 is the miss of cycle 1’s retest. It is promoted without waiting for a repeat, because a miss measured here is a local explanandum, and it is not evidence for any answer. F001 is deferred: it concerns what the model gets wrong, and this objective concerns whether the estimate predicts the score. Then a first attempt: “Which feature carries the prompt signal?”",
+  w:[find("F005",null,"promoted","promoted at step 3: a local explanandum, no repeat needed"),find("F001",null,"deferred","deferred at step 3: this objective does not need it")]},
+ {c:1,n:"g3",a:"No, back to the loop.",t:"A how question, but it explains the model, while the objective asks about the estimate. The grouped split removes the leakage whichever feature carries it. It is also a lever question dressed as a why: its answer could only pick a feature to drop."},
  {c:1,n:"s1",t:"The loop reads the tree first, so it starts from what cycle 1 excluded and left weak. New questions: how large is the noise on the 0.04? Do different prompt ids always mean different prompts? Which rows make up the estimate?"},
  {c:1,n:"s2",t:"The public set has 2,000 rows. Many prompts are near-copies with different ids: 38% of validation rows have a similar prompt in the training folds. 60% of rows come from external datasets."},
  {c:1,n:"ans",t:"The prompt-id question now has a puzzle attached: grouping by id may not have finished the job H001 started. The loop ends."},
- {c:1,n:"s3",t:"Second attempt: “Why does the grouped estimate still sit 0.04 above the public score?”"},
+ {c:1,n:"s3",t:"Second attempt: “Why does the grouped estimate still sit 0.04 above the public score?” Kind: a puzzle. Its local explanandum is the 0.04 between the grouped estimate of 0.46 and the public 0.42, outside the 0.03 the retest allowed. Branch budget: four of the five remaining runs and both remaining submissions. The half-of-what-remains limit does not bind, because no other open question reaches the objective."},
  {c:1,n:"g3",a:"Yes.",t:"Closing this gap is the objective. The rejected feature question stays in the tree as an open branch, visibly untested.",
   w:[node("N2","Why does the grouped estimate still sit 0.04 above the public score?","N1","Child of N1, on the H001 branch. Open branch: which feature carries the prompt signal (untested).")]},
- {c:1,n:"s4",t:"A new family. H005 is cycle 1’s pruned “the public set is noisy”, back now because it has a size and can fail. H006 refines H001 with a finer unit. “The test set is just harder” is pruned.",
+ {c:1,n:"s4",t:"A new family. H005 is cycle 1’s pruned “the public set is noisy”, back now because it has a size and can fail. H006 refines H001 with a finer unit. “The test set is just harder” is pruned. H005 is exclusive with each of the others: if the 0.04 is noise, nothing is left to explain. H006, H007 and H008 are compound, and H009 names H006 and H007 together. Counted once, the family has two rivals.",
   w:[hyp("H005","N2","Noise: the 0.04 is only sampling noise"),hyp("H006","N2","Prompt families: near-copies still cross folds"),hyp("H007","N2","Validation mix: external rows are easier"),hyp("H008","N2","Generator shift in the public texts"),hyp("H009","N2","H006 and H007 each carry part"),none("N2")]},
  {c:1,n:"s5",t:"Predictions with sizes. H008 stays untested on purpose: its test costs a submission, and both remaining submissions are committed to the stop criterion. It stays visible, so nobody reads it as excluded.",
   w:[pred("H005","Combined standard error ≥ 0.02"),pred("H006","Family grouping drops the estimate ≥ 0.02"),pred("H007","Own rows score ≥ 0.02 below the pool"),pred("H008","Train-vs-public classifier AUC ≥ 0.70"),pred("H009","Both moves ≥ 0.01"),set("H008","untested",null,"H008 kept visible as untested")]},
- {c:1,n:"s6",t:"Cycle 1’s three-seed rule cannot resolve this, so a new rule is fixed first: ten seeds. The cosine threshold of 0.6 is fixed too and will not be swept. The retest is frozen as well: two new models, estimates written down before each submission.",
+ {c:1,n:"s6",t:"Cycle 1’s three-seed rule cannot resolve this, and the loop record’s noise floor row holds only the baseline at ±0.01 on three seeds, so a new rule is fixed first: ten seeds. The cosine threshold of 0.6 is fixed too and will not be swept. The retest is frozen as well: two new models, estimates written down before each submission. Every outcome is mapped, and the partial zones are written as undecided: they exclude nothing.",
   w:[run("P002","N2","Score E003’s control predictions by data source"),run("P003","N2","Binomial standard error, plus a prompt bootstrap"),run("E003","N2","Id-grouped vs family-grouped split, ten seeds"),run("E004","N2","Retest: character n-gram model"),run("E005","N2","Retest: small transformer, the likeliest to fail")]},
  {c:1,n:"s7",fail:1,t:"E003 control 0.46, family arm 0.43: a drop of 0.03, or 3.4 standard errors. P003 gives a combined standard error of 0.016. P002 finds own rows 0.005 below the pool. Then E004’s notebook attaches the latest version of a dataset, and the manifest check stops it before a submission is spent.",
-  w:[res("E003","0.43 ± 0.02 family vs 0.46 ± 0.02 id-grouped"),res("P003","Combined standard error 0.016; the 0.04 is 2.5 standard errors"),res("P002","Own rows 0.455, external 0.465")]},
+  w:[res("E003","0.43 ± 0.02 family vs 0.46 ± 0.02 id-grouped"),res("P003","Combined standard error 0.016; the 0.04 is 2.5 standard errors"),res("P002","Own rows 0.455, external 0.465"),rec("floor","Baseline: ±0.01 on three seeds (stratified), ±0.02 on ten seeds (grouped). Other model families: not measured.")]},
  {c:1,n:"g7",a:"No, not clean for E004.",fail:1,t:"The other runs are clean. E004 cannot be read, so it records no exclusion."},
  {c:1,n:"s6",fail:1,t:"The attached version was a declared auxiliary. Attach the pinned one. This check exists because of cycle 1’s hygiene finding, so what cycle 1 kept has just saved a submission.",
-  w:[rescue("Entry 2: E004 aborted. Blamed: attached dataset version, declared at step 6. Fix: attach the pinned version. No hypothesis has been saved twice.")]},
+  w:[rescue("Entry 2: E004 aborted. Blamed: attached dataset version, declared at step 6. Fix: attach the pinned version. No hypothesis has been saved twice."),rec("rescue","E002: 1 (stale data, under H002). E004: 1 (attached dataset version, under no hypothesis). Every other hypothesis: 0.")]},
  {c:1,n:"s7",t:"Estimates are written down, then submitted. E004: estimate 0.47, public 0.45. E005: estimate 0.52, public 0.50. Both differ by 0.02.",
   w:[res("E004","Estimate 0.47, public 0.45"),res("E005","Estimate 0.52, public 0.50")]},
  {c:1,n:"g7",a:"Yes, clean.",t:"The baseline’s difference of 0.01 does not count toward the stop criterion, because the split was chosen with that score in view."},
  {c:1,n:"s8",t:"The same checks again. F001 repeats at 56% on a different model under a different split, so it no longer depends on one run. And something new: all three estimates sit above their public scores.",
   w:[find("F001",null,"deferred","repeated at 56% on E005"),find("F002","All three estimates sit above their public scores: 0.01, 0.02, 0.02.","open","seen at step 8")]},
- {c:1,n:"s9",t:"P003 excludes H005, and P002 excludes H007 and H009 (both medium severity). E003 corroborates H006 (high for the drop, low for the threshold). E004 and E005 corroborate H001 and H006 (medium: a protocol off by 0.04 would still pass both submissions between 8% and 29% of the time).",
-  w:[set("H003","excluded","P001, P003"),set("H005","excluded","P003"),set("H007","excluded","P002"),set("H009","excluded","P002"),set("H006","corroborated","E003, E004, E005"),set("H001","corroborated","E001, E004, E005")]},
+ {c:1,n:"s9",t:"P003 excludes H005, and P002 excludes H007 and H009 (both medium severity). E003 corroborates H006 (high for the drop, low for the threshold). E004 and E005 corroborate H001 and H006 (medium: a protocol off by 0.04 would still pass both submissions between 8% and 29% of the time). Cycle 1’s miss is revised: its cause, unknown, becomes auxiliary. The grouping unit, prompt id, was too coarse, and the assertion declared in cycle 1 passed because it checked the wrong unit.",
+  w:[set("H003","excluded","P001, P003"),set("H005","excluded","P003"),set("H007","excluded","P002"),set("H009","excluded","P002"),set("H006","corroborated","E003, E004, E005"),set("H001","corroborated","E001, E004, E005"),
+     find("F005",null,"promoted","tested at step 9: cause found, grouping unit too coarse"),
+     rec("miss","1 process miss: H001’s retest, −0.04 against ±0.03, cause revised from unknown to auxiliary (the grouping unit was too coarse). Apart from it, 6 refutations (H002, H003, H004; H005, H007, H009), cause hypothesis."),
+     rec("cost","4 training runs against 4 planned, so 1.0. Across both cycles, 7 against 7. Branch budget: 4 of 4 runs, 2 of 2 submissions.")]},
  {c:1,n:"g8",a:"One tested survivor: H006, with its parent H001.",t:"H008 is still live, but nothing has been run against it, so it is not a measured rival. The placeholder stays live."},
  {c:1,n:"oOne",t:"Best of this family, not proven. E003 and the two retests are the risky tests it had to pass. The debt from cycle 1 is paid."},
- {c:1,n:"s10",t:"Apply: the family-grouped split with checked data becomes the protocol. Measure: E004 and E005 already did. Store: the first project knowledge appears. Also, H002, H003 and H004 were excluded under a protocol now replaced, so that is logged as a question.",
-  w:[know("k1","Near-copied prompts leak across folds.","E001, E003"),know("k2","This protocol predicts the public score within 0.03. Caution: F002.","E004, E005"),find("F004","H002, H003 and H004 were excluded under the old stratified protocol. Do they still stand?","open","reopened at step 10: conditions changed")]},
+ {c:1,n:"s10",t:"Apply: the family-grouped split with checked data becomes the protocol. Measure: E004 and E005 already did. Store: the first project knowledge appears. Also, H002, H003 and H004 were excluded under a protocol now replaced, so that is logged as a question. F005 closes: its cause was found, and the protocol now fixes it.",
+  w:[know("k1","Near-copied prompts leak across folds.","E001, E003"),know("k2","This protocol predicts the public score within 0.03. Caution: F002.","E004, E005"),find("F004","H002, H003 and H004 were excluded under the old stratified protocol. Do they still stand?","open","reopened at step 10: conditions changed"),find("F005",null,"closed","used at step 10: closed, the protocol groups by family")]},
  {c:1,n:"g9",a:"Yes: objective met and budget spent.",t:"Two submissions in a row within 0.03 under one fixed protocol. Budget: 7 of 8 runs, 3 of 3 submissions, 11 of 14 days.",w:[used(7,3,11)]},
  {c:1,n:"stop",t:"The report names a run for every claim. It marks one line as interpretation: that near-copied prompts are the mechanism is inferred, since E003 shows the split matters, not exactly why. It also says what would still refute the protocol. F001 leaves as deferred, with its reason."},
 
  {c:2,n:"s0",t:"A new objective, by the purple edge. F001 was deferred because the last objective did not need it. It can now be taken up: raise the public score by reducing errors within model families. Budget: 6 runs, 2 submissions, 2 weeks.",
   w:[obj("Raise the public score by reducing the errors made within model families.","A public score at least 0.03 above 0.50, with the local estimate within 0.03 of it.",6,2,14)]},
  {c:2,n:"s2",t:"The loop starts from project knowledge, so the protocol, the pinned data and every exclusion carry over and are not re-derived. E005 sizes the problem: the family is right on 0.79 of rows, and within those the sibling is right 0.66 of the time."},
- {c:2,n:"s3",t:"Open findings first. F001 is promoted: it repeated, and this objective needs it. F002 is deferred. F004 is dropped, with reasons: H003 and H004 stand, and rechecking H002 would change no decision. The question: “Why are errors concentrated within model families?”",
+ {c:2,n:"s3",t:"Open findings first. F001 is promoted: it repeated, and this objective needs it. F002 is deferred. F004 is dropped, with reasons: H003 and H004 stand, and rechecking H002 would change no decision. The question: “Why are errors concentrated within model families?” Kind: a puzzle. Its local explanandum is F001: within-family errors at 58% on E001 and 56% on E005, against about 15% if spread evenly. Branch budget: three of the six runs and one of the two submissions. Expected gain: +0.03 on the public score, an estimate. The gain ratio row is still empty, so it is shown undiscounted.",
   w:[find("F001",null,"promoted","promoted at step 3: it repeats, and this objective needs it"),find("F002",null,"deferred","deferred at step 3: this objective does not depend on it"),find("F004",null,"dropped","dropped at step 3: H003 and H004 stand; H002 would change no decision")]},
  {c:2,n:"g3",a:"Yes.",t:"A why question that serves the objective. F001 gave the question. It is not evidence for any answer.",
   w:[node("N3","Why are errors concentrated within model families?",null,"New objective. The question came from F001.")]},
- {c:2,n:"s4",t:"Four rivals and a placeholder. “Family errors are just harder” is pruned: it forbids nothing, and H010 is its testable form.",
+ {c:2,n:"s4",t:"Four rivals and a placeholder. “Family errors are just harder” is pruned: it forbids nothing, and H010 is its testable form. H010 is exclusive with H012, since the E007 rows kill one and spare the other. H010 and H011, and H011, H012 and H013 with one another, are compound, so those three count once.",
   w:[hyp("H010","N3","A ceiling: siblings write too much alike"),hyp("H011","N3","Too few examples per sibling"),hyp("H012","N3","Wrong design: a flat classifier spends capacity on families"),hyp("H013","N3","Noisy labels between siblings"),none("N3")]},
  {c:2,n:"s5",t:"Each states a size on within-family accuracy, or on the share of mislabelled rows.",
   w:[pred("H010","No dedicated classifier gains ≥ 0.02"),pred("H011","Doubling the data gains ≥ 0.05"),pred("H012","A dedicated classifier gains ≥ 0.05"),pred("H013","≥ 10% of 200 audited rows mislabelled")]},
- {c:2,n:"s6",t:"Three tests, with E005 as the control, on the same folds and metric. The family map is written down before the run and not changed afterwards.",
+ {c:2,n:"s6",t:"Three tests, with E005 as the control, on the same folds and metric. The family map is written down before the run and not changed afterwards. Every outcome is mapped. Two of them, a gain of at least 0.05 on E006 and 10% or more mislabelled in P004, corroborate without excluding, and are written so.",
   w:[run("P004","N3","Audit 200 within-family errors by hand"),run("E006","N3","Flat transformer on half the rows"),run("E007","N3","Dedicated within-family classifiers")]},
  {c:2,n:"s7",t:"P004: 4 of 200 rows mislabelled. E006: 0.64 on half the data against 0.66. E007: 0.73 against 0.66, a gain of 0.07.",
-  w:[res("P004","2% of 200 mislabelled"),res("E006","0.64 vs 0.66, gain 0.02"),res("E007","0.73 vs 0.66, gain 0.07")]},
+  w:[res("P004","2% of 200 mislabelled"),res("E006","0.64 vs 0.66, gain 0.02"),res("E007","0.73 vs 0.66, gain 0.07"),rec("floor","Baseline: ±0.01 (three seeds, stratified), ±0.02 (ten seeds, grouped). Transformer: ±0.01 on within-family accuracy, three seeds; on the estimate, not measured.")]},
  {c:2,n:"g7",a:"Yes, clean.",t:"All three are clean. No rescue this time."},
  {c:2,n:"s8",t:"The standing checks show one more surprise: the errors E007 still makes fall mostly in the two newest families.",
   w:[find("F003","61% of remaining within-family errors fall in the two newest families. Source: E007.","open","seen at step 8")]},
- {c:2,n:"s9",t:"P004 excludes H013. E006 excludes H011. E007 excludes H010 and corroborates H012, with high severity: with no design effect, the gain would have stayed below 0.02.",
-  w:[set("H013","excluded","P004"),set("H011","excluded","E006"),set("H010","excluded","E007"),set("H012","corroborated","E007"),find("F001",null,"promoted","tested: linked to H010 to H013")]},
+ {c:2,n:"s9",t:"P004 excludes H013. E006 excludes H011. E007 excludes H010 and corroborates H012, with high severity: with no design effect, the gain would have stayed below 0.02. The survivor’s prediction was met. The three excluded rivals’ were missed, each with cause hypothesis: ordinary refutations.",
+  w:[set("H013","excluded","P004"),set("H011","excluded","E006"),set("H010","excluded","E007"),set("H012","corroborated","E007"),find("F001",null,"promoted","tested: linked to H010 to H013"),
+     rec("miss","1 process miss: H001’s retest, −0.04 against ±0.03, cause auxiliary. None this cycle. Apart from it, 9 refutations in all (3 this cycle), cause hypothesis.")]},
  {c:2,n:"g8",a:"One: H012.",t:"Corroborated, not proven. The next step is its hardest test so far, because it moves from a local comparison to the public score."},
  {c:2,n:"oOne",t:"It must pass its own risky test before it counts."},
  {c:2,n:"s10",t:"Apply: replace the flat classifier with two stages. Predict the family, then use that family’s own classifier. This is not yet measured, so it takes the red edge. Written before the run: an estimate near 0.58, and a public score within 0.03 of whatever the estimate turns out to be."},
- {c:2,n:"s10",hops:["s5","s6","s7","g7","s8","s9","g8","oOne","s10"],t:"E008 passes through steps 5 to 9 and comes back measured. Estimate 0.58, public 0.56: a difference of 0.02, and 0.06 above the transformer. So F001 has been seen, tested and used. It closes, and what holds is stored with its conditions.",
+ {c:2,n:"s10",hops:["s5","s6","s7","g7","s8","s9","g8","oOne","s10"],t:"E008 passes through steps 5 to 9 and comes back measured. Estimate 0.58, public 0.56: a difference of 0.02, and 0.06 above the transformer. So F001 has been seen, tested and used. It closes, and what holds is stored with its conditions. The loop record gains its first ratio: realized +0.06 against the expected +0.03, so 2.0 on one question, which is an anecdote.",
   w:[run("E008","N3","Two-stage model, written before the run"),res("E008","Estimate 0.58, public 0.56"),set("H012","corroborated","E007, E008"),find("F001",null,"closed","used at step 10: closed, stored as knowledge"),
      know("k1","Grouping must be by prompt family, not prompt id. Near-copied prompts leak across folds. Tested on the baseline, at cosine 0.6.","E001, E003"),
      know("k2","The family-grouped protocol predicted the public score within 0.03 on three new models. It may run about 0.02 high, cause unknown. Tested in this competition only.","E004, E005, E008; F002"),
      know("k3","Dataset drift did not cause the gap, but it is a real defect, and the manifest check catches it. Tested under the stratified split.","E002, E004"),
      know("k4","Sibling errors respond to model design, not to more data or cleaner labels. Tested on this competition’s families, from one transformer.","P004, E006, E007, E008"),
-     know("k5","Not yet known: whether public texts differ from training texts, and why the newest families remain hardest.","H008, F003")]},
+     know("k5","Not yet known: whether public texts differ from training texts, and why the newest families remain hardest.","H008, F003"),
+     rec("gain","2.0: realized +0.06 on the public score against the expected +0.03."),rec("rescue","E002: 1, E004: 1, both setup, under no surviving hypothesis. This cycle: 0."),rec("cost","3 training runs against 3 planned, so 1.0. Across the three cycles, 10 against 10. Branch budget: 3 of 3 runs, 1 of 1 submission.")]},
  {c:2,n:"g9",a:"Yes: objective met.",t:"0.56 is at least 0.03 above 0.50, and the estimate is within 0.03. Budget: 3 of 6 runs, 1 of 2 submissions, 6 of 14 days.",w:[used(3,1,6)]},
- {c:2,n:"stop",t:"The final report. Interpretation is marked: that a flat model spends its capacity on families is the explanation H012 offers, while E007 and E008 show the gain, not the reason. F002 is deferred and F003 stays open, ready for whoever reads the project knowledge next."},
+ {c:2,n:"stop",t:"The final report. Interpretation is marked: that a flat model spends its capacity on families is the explanation H012 offers, while E007 and E008 show the gain, not the reason. F002 is deferred and F003 stays open, ready for whoever reads the project knowledge next. The loop record goes in the report too, and nothing is tuned on it before fifteen or twenty reviewed runs."},
 ]};
 
 /* ---------- Example 2 ---------- */
@@ -720,6 +773,7 @@ const EX2 = {cycles:["Round 1","Round 2"], trace:[
  {c:0,n:"g8",a:"None.",t:"Every hypothesis in the family is excluded."},
  {c:0,n:"oNone",t:"The placeholder has come true. And the failure is informative: the drops over-account by 1.1, so some pair of components shares part of the gain. The baseline’s settings may also own a part. The question stands.",
   w:[set("N1-none","true","E001","Round 1 placeholder came true")]},
+ {c:0,n:"gB",a:"Yes.",t:"The red edge returns to step 4 on the same question, so the gate reads three numbers first. Rivals added against excluded: 4 added, 4 excluded, all by E001. Realized against predicted gain: none closed, but the clause counts only after two runs and E001 is one. Branch budget used: 9 of 25 runs. None of the three holds, so the cycle returns to step 4."},
 
  {c:1,n:"s4",t:"The red edge lands here, skipping step 3, so F001 is decided here. It is promoted: it gives H005 its grounds, but it is not evidence for it. These hypotheses are not rivals: any subset can hold at once. “The components interact somehow” is pruned.",
   w:[find("F001",null,"promoted","promoted at step 4: it bears on the widened family"),hyp("H005","N1","Curriculum × schedule: curriculum pays only with a long schedule"),hyp("H006","N1","Hyperparameter mismatch: the paper’s baseline is undertuned"),hyp("H007","N1","Loss × schedule: the loss pays only with a long schedule"),{op:"hyp",id:"N1-none2",n:"N1",text:"None of the above (fresh)",status:"placeholder"}]},
@@ -741,7 +795,8 @@ const EX2 = {cycles:["Round 1","Round 2"], trace:[
  {c:1,n:"oSev",t:"Measure each contribution. Baseline settings 0.8, curriculum 1.5, loss 1.1, schedule alone 0.6, curriculum × schedule 2.0. They sum to 6.0. The paper’s attribution is partly right: the curriculum is in 3.5 of the 6.0 points, but 2.0 of those exist only with the long schedule."},
  {c:1,n:"s10",t:"Apply: adopt the recipe’s settings, the loss, and the curriculum together with the long schedule. Do not adopt the long schedule without the curriculum. This is not yet measured, and the weights came from another training set, so it can fail."},
  {c:1,n:"s10",hops:["s5","s6","s7","g7","s8","s9","g8","oSev","s10"],t:"E004, on our own pipeline, written before the run: a gain of at least 4.0 over 58.0. Result: 63.2 ± 0.3, a gain of 5.2. So F001 has been seen, tested and used, and it closes. Store what holds, with its conditions.",
-  w:[run("E004","N1","Full adoption on our own pipeline"),res("E004","63.2 ± 0.3 vs 58.0 ± 0.3"),find("F001",null,"closed","used at step 10: closed"),know("k1","For this recipe, the curriculum pays mostly with a long schedule. Holds for this benchmark and model size; gain confirmed once on our own pipeline.","E002, P001, E004"),know("k2","A paper’s baseline may be undertuned, so its gain can include hyperparameters.","E003"),hyg("The paper’s comparison confounded its components with its hyperparameters. Not a cause of the gain, but a defect in how it was reported.")]},
+  w:[run("E004","N1","Full adoption on our own pipeline"),res("E004","63.2 ± 0.3 vs 58.0 ± 0.3"),find("F001",null,"closed","used at step 10: closed"),know("k1","For this recipe, the curriculum pays mostly with a long schedule. Holds for this benchmark and model size; gain confirmed once on our own pipeline.","E002, P001, E004"),know("k2","A paper’s baseline may be undertuned, so its gain can include hyperparameters.","E003"),hyg("The paper’s comparison confounded its components with its hyperparameters. Not a cause of the gain, but a defect in how it was reported."),
+     rec("gain","1.1: 6.0 of the 6.0 points accounted for, against 5.4 expected."),rec("miss","None for the process. 5 refutations, cause hypothesis (H001 to H004 by E001, H007 by E002)."),rec("floor","±0.3 per arm at three seeds, one model size."),rec("rescue","1: E002’s arm C, seed 12 (a diverged seed, under no hypothesis)."),rec("cost","22 training runs against 21 planned, so 1.05. The extra run is the reserve seed. Branch budget: 22 of 25 runs.")]},
  {c:1,n:"g9",a:"Yes: objective met.",t:"Every named contribution is measured, and the weights sum to the reproduced gain. Budget: 31 of 40 runs launched, 17 of 21 days.",w:[used(31,null,17)]},
  {c:1,n:"stop",t:"The report marks its interpretation: that the long schedule gives the curriculum steps to spend on hard examples is inferred. P001 shows where the gain falls, not why. F002 leaves as deferred. Across both examples, two drawn paths are still unexercised.",
   w:[find("F002",null,"deferred","deferred at Stop: the accounting did not need it")]},
@@ -770,7 +825,7 @@ function pathOf(i) {
 
 /* Fold the trace up to a moment. Going backward just replays, so scrubbing is exact. */
 function fold(upto) {
-  const s = {objective:null, used:null, nodes:[], hyps:{}, runs:{}, finds:{}, rescues:[], hyg:[], know:{}, fresh:new Set(), lines:[]};
+  const s = {objective:null, used:null, nodes:[], hyps:{}, runs:{}, finds:{}, rescues:[], hyg:[], know:{}, rec:{}, fresh:new Set(), lines:[]};
   for (let i = 0; i <= upto; i++) {
     for (const o of ex.trace[i].w || []) {
       const now = i === upto; let line = null, mark = null;
@@ -789,6 +844,7 @@ function fold(upto) {
       if (o.op === "rescue") { s.rescues.push(o.text); mark = "rescue" + (s.rescues.length - 1); line = "Rescue log entry added"; }
       if (o.op === "hyg") { s.hyg.push(o.text); mark = "hyg" + (s.hyg.length - 1); line = "Hygiene finding logged apart"; }
       if (o.op === "know") { s.know[o.id] = o; mark = o.id; line = "Project knowledge: " + o.text.split(". ")[0].replace(/\.$/, ""); }
+      if (o.op === "rec") { s.rec[o.row] = o.text; mark = "rec-" + o.row; line = "Loop record, " + RECN[o.row].toLowerCase() + ": " + o.text; }
       if (now) { if (mark) s.fresh.add(mark); if (line) s.lines.push(line); }
     }
   }
@@ -814,7 +870,7 @@ function buildMap() {
   for (const [key, d, fam, ...labels] of EDGES) {
     edgeEls[key] = el("path", {d, class:`ed ${fam}`, "marker-end":`url(#a-${fam})`}, edges);
     edgeEls[key].dataset.fam = fam;
-    for (const l of labels) el("text", {x:l.x, y:l.y, "text-anchor":l.a || "start", class:`el ${fam}`}, svg, l.t);
+    for (const l of labels) { const t = el("text", {x:l.x, y:l.y, "text-anchor":l.a || "start", class:`el ${fam}`}, svg, l.t); if (l.r) t.setAttribute("transform", `rotate(-90 ${l.x} ${l.y})`); }
   }
   for (const id in NODES) {
     const n = NODES[id];
@@ -827,19 +883,25 @@ function buildMap() {
       const p = `${n.cx},${n.cy-n.h/2} ${n.cx+n.w/2},${n.cy} ${n.cx},${n.cy+n.h/2} ${n.cx-n.w/2},${n.cy}`;
       el("polygon", {points:p, class:"halo", style:`transform-origin:${cx}px ${cy}px`}, g); el("polygon", {points:p, class:"sh"}, g);
       textLines(g, n.tt, cx, cy, "tt");
-    } else if (n.kind === "tree") {
+    } else if (n.kind === "tree" || n.kind === "loop") {
       const rx = n.w/2, ry = 15, top = n.y + ry, bot = n.y + n.h - ry;
       const d = `M${n.x} ${top}A${rx} ${ry} 0 0 1 ${n.x+n.w} ${top}V${bot}A${rx} ${ry} 0 0 1 ${n.x} ${bot}Z`;
       el("path", {d, class:"sh"}, g);
       el("path", {d:`M${n.x} ${top}A${rx} ${ry} 0 0 0 ${n.x+n.w} ${top}`, fill:"none", class:"sh", style:"fill:none"}, g);
+      if (n.kind === "loop") {
+        el("text", {x:cx, y:n.y+50, "text-anchor":"middle", class:"tt", style:"font-size:14px"}, g, "Loop record");
+        el("text", {x:cx, y:n.y+66, "text-anchor":"middle", class:"el", style:"fill:var(--ink)!important"}, g, "Never edited by hand");
+        REC.forEach(([k, lab], i) => el("text", {id:"lr-" + k, x:cx, y:n.y+94+i*17, "text-anchor":"middle", class:"lr off"}, g, lab));
+      } else {
       el("text", {x:cx, y:n.y+50, "text-anchor":"middle", class:"tt", style:"font-size:15px"}, g, "Logical tree + notebook");
       el("text", {x:cx, y:n.y+67, "text-anchor":"middle", class:"el", style:"fill:var(--ink)!important"}, g, "Grows every cycle. Nothing is erased.");
-      const cols = [["c-live","live"],["c-excl","excluded"],["c-runs","runs"],["c-find","findings"],["c-know","knowledge"]];
+      const cols = [["c-live","live"],["c-excl","excluded"],["c-runs","runs"],["c-find","findings"],["c-know","known"]];
       cols.forEach(([cid, lab], i) => {
-        const x = n.x + 40 + i * 67;
+        const x = n.x + 34 + i * 56;
         el("text", {id:cid, x, y:n.y+112, "text-anchor":"middle", class:"count-n"}, g, "0");
         el("text", {x, y:n.y+130, "text-anchor":"middle", class:"count"}, g, lab);
       });
+      }
     } else {
       const rx = n.kind === "stop" ? 20 : 3;
       el("rect", {x:n.x,y:n.y,width:n.w,height:n.h,rx,class:"halo",style:`transform-origin:${cx}px ${cy}px`}, g);
@@ -934,6 +996,9 @@ function renderBook(s) {
 
   const ks = Object.values(s.know);
   $("know").innerHTML = ks.length ? `<ul>${ks.map((k) => `<li class="${fr(s, k.id)}">${esc(k.text)} <span class="runs-of">(${esc(k.by)})</span></li>`).join("")}</ul>` : `<p class="empty" style="color:var(--ink)">Empty. A corroboration with a test still owed does not count.</p>`;
+
+  $("rec").innerHTML = REC.map(([k, lab]) => `<div class="rec-row${fr(s, "rec-" + k)}"><span class="k">${lab}</span><span class="${s.rec[k] ? "" : "none"}">${s.rec[k] ? esc(s.rec[k]) : "not written yet"}</span></div>`).join("");
+  REC.forEach(([k]) => $("lr-" + k).classList.toggle("off", !s.rec[k]));
 
   const hs = Object.values(s.hyps);
   $("c-live").textContent = hs.filter((h) => h.status === "live" || h.status === "corroborated" || h.status === "untested").length;
