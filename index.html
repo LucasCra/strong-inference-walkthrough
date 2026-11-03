@@ -37,6 +37,7 @@
 body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 var(--body); }
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--panel); }
 .wrap { max-width: 1480px; margin-inline: auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+[hidden] { display: none !important; }
 h1, h2, h3 { font-family: var(--display); font-weight: 700; text-wrap: balance; margin: 0; line-height: 1.12; }
 h1 { font-size: clamp(30px, 4.2vw, 50px); letter-spacing: -0.02em; }
 h2 { font-size: clamp(22px, 2.4vw, 30px); letter-spacing: -0.01em; }
@@ -44,6 +45,13 @@ h3 { font-size: 16px; }
 p { margin: 0; }
 .mono { font-family: var(--mono); font-size: .9em; }
 .label { font: 500 11px/1.3 var(--mono); letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+
+/* Page switch */
+.tabs { display: flex; gap: 0; padding-top: 14px; border-bottom: 1px solid var(--rule); }
+.tabs a { font: 500 13px/1 var(--body); color: var(--muted); text-decoration: none; padding: 10px 14px 9px; border: 1px solid transparent; border-bottom: 0; margin-bottom: -1px; }
+.tabs a:hover { color: var(--ink); }
+.tabs a[aria-current="page"] { color: var(--ink); background: var(--panel); border-color: var(--rule); font-weight: 600; }
+a.pagelink { color: var(--back); }
 
 /* Opening */
 header { padding-block: 32px 22px; display: grid; gap: 14px 40px; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: end; }
@@ -92,12 +100,16 @@ button:hover, select:hover { border-color: var(--ink); }
 .mapnode.stop .sh { fill: var(--stop-bg); stroke: var(--stop-line); }
 .mapnode.tree .sh, .mapnode.loop .sh { fill: var(--tree-bg); stroke: var(--tree-line); }
 .mapnode.box .sh { fill: var(--box-bg); stroke: var(--step-line); }
+.mapnode.store .sh { fill: var(--tree-bg); stroke: var(--tree-line); }
+.mapnode.support .sh { stroke-dasharray: 5 3; }
+.mapnode .sub { font-size: 10.5px; fill: var(--muted); }
 .mapnode .tt { font-size: 13px; font-weight: 600; }
 .mapnode.gate .tt, .mapnode.out .tt { font-size: 12px; font-weight: 500; }
 .mapnode:hover .sh { stroke-width: 2.4; }
 .mapnode:focus { outline: none; }
 .mapnode:focus-visible .sh { stroke: var(--back); stroke-width: 3; }
 .mapnode.viewed .sh { stroke: var(--ink); stroke-width: 2.2; stroke-dasharray: 4 3; }
+.mapnode.support.viewed .sh { stroke-dasharray: 4 3; }
 .mapnode.now .sh { stroke: var(--ink); stroke-width: 3.4; stroke-dasharray: none; }
 .halo { fill: none; stroke: var(--ink); stroke-width: 2; opacity: 0; pointer-events: none; }
 .mapnode.now .halo { animation: halo 1.8s ease-out infinite; }
@@ -111,12 +123,13 @@ button:hover, select:hover { border-color: var(--ink); }
 .ed { fill: none; stroke-width: 1.5; }
 .ed.flow { stroke: var(--flow); } .ed.back { stroke: var(--back); } .ed.recycle { stroke: var(--recycle); stroke-width: 2.3; }
 .ed.newobj { stroke: var(--new-obj); stroke-width: 1.9; } .ed.read { stroke: var(--read); stroke-dasharray: 5 4; }
+.ed.dim { stroke: var(--out-line); stroke-dasharray: 5 4; } .ed.test { stroke: var(--flow); stroke-dasharray: 5 4; }
 .ed { opacity: .5; transition: opacity .2s, stroke-width .2s; }
 .ed.walked { opacity: 1; }
 .ed.taken, .ed.moving { opacity: 1; stroke-width: 3.6; }
 .ed.untaken { opacity: .14; }
 .el { font-size: 11px; fill: var(--muted) !important; }
-.el.recycle { fill: var(--recycle) !important; } .el.back { fill: var(--back) !important; } .el.newobj { fill: var(--new-obj) !important; } .el.read { fill: var(--read) !important; }
+.el.recycle { fill: var(--recycle) !important; } .el.back { fill: var(--back) !important; } .el.newobj { fill: var(--new-obj) !important; } .el.read { fill: var(--read) !important; } .el.test { fill: var(--flow) !important; }
 #dot { fill: var(--ink); stroke: var(--panel); stroke-width: 2; pointer-events: none; }
 .pop { fill: var(--pop-line); stroke: var(--panel); stroke-width: 1.4; pointer-events: none; }
 .count { font: 500 10.5px var(--mono) !important; }
@@ -182,6 +195,8 @@ section { padding-block: 20px; }
 .chip.open { background: var(--gate-bg); border-color: var(--gate-line); } .chip.promoted { background: var(--step-bg); border-color: var(--step-line); }
 .chip.closed { background: var(--tree-bg); border-color: var(--tree-line); } .chip.dropped, .chip.deferred { color: var(--muted); }
 .chip.true { background: var(--out-bg); }
+.chip.blocked { background: var(--out-bg); border-color: var(--out-line); } .chip.saturated { background: var(--tree-bg); border-color: var(--tree-line); } .chip.undecided { border-style: dashed; }
+.chip.inside { background: var(--tree-bg); border-color: var(--tree-line); } .chip.outside { border-color: var(--recycle); color: var(--recycle); } .chip.calibration { background: var(--gate-bg); border-color: var(--gate-line); }
 .runs { display: grid; gap: 2px; margin-top: 6px; padding-top: 5px; border-top: 1px dotted var(--rule); font-size: 12.5px; }
 .runs .run { padding-left: 42px; text-indent: -42px; }
 .runs .mono { display: inline-block; width: 42px; text-indent: 0; font-weight: 500; }
@@ -205,6 +220,19 @@ section { padding-block: 20px; }
 .fresh { animation: fresh 2.6s ease-out; }
 @keyframes fresh { 0%, 45% { background: var(--fresh); } 100% { background: transparent; } }
 
+.lt { min-width: 520px; font-size: 12.5px; }
+.lt th, .lt td { padding: 5px 8px; }
+.lt td:first-child { white-space: normal; }
+.lt td.num, .lt th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.lt tr.fresh td { animation: fresh 2.6s ease-out; }
+.facts { margin: 6px 0 0; padding-left: 17px; font-size: 13px; color: var(--muted); }
+.bl-card { padding-block: 7px; border-top: 1px solid var(--rule); font-size: 13px; }
+.bl-card:first-of-type { border-top: 0; padding-top: 0; }
+.bl-card dl { margin: 4px 0 0; display: grid; gap: 2px; }
+.bl-card dl > div { display: grid; grid-template-columns: 82px minmax(0, 1fr); gap: 8px; }
+.bl-card dt { font: 500 11px/1.6 var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.bl-card dd { margin: 0; }
+
 /* Reference */
 .tw { overflow-x: auto; background: var(--panel); border: 1px solid var(--rule); }
 table { border-collapse: collapse; width: 100%; font-size: 13.5px; min-width: 700px; }
@@ -227,13 +255,30 @@ select { max-width: 100%; }
 </style>
 
 <div class="wrap">
+  <nav class="tabs" aria-label="Pages">
+    <a id="tab-base" href="#base">The base cycle</a>
+    <a id="tab-kaggle" href="#kaggle">On a Kaggle competition</a>
+  </nav>
+</div>
+
+<div class="wrap" id="hd-base">
 <header>
   <div>
     <p class="label">Research method, drawn as a working cycle</p>
     <h1 style="margin-top:7px">Strong inference, one step at a time</h1>
     <p class="lead">Strong inference is a way to do research: write several rival explanations, design an experiment that rules some of them out, then repeat with what is left. Press Play to watch an invented ML project move through the workflow, and see what each step needs, does, produces and stores.</p>
   </div>
-  <p class="status"><b>A concept with one real run behind it.</b> A harness built from an earlier draft of this workflow ran once on a real problem (name-that-llm, 2026-10-31 to 11-01). Three mechanisms were added from what that run showed: the loop record, the cause of a miss, and the branch gate with its Parked outcome. Every run and number in the walkthrough is still invented, except the two facts marked (real). The “needs”, “outputs” and “stores” fields, and some “why here” text, are this page’s summary of the diagram and its explanation.</p>
+  <p class="status"><b>A concept with one real run behind it.</b> A harness built from an earlier draft of this workflow ran once on a real problem (name-that-llm, 2026-10-31 to 11-01). Three mechanisms were added from what that run showed: the loop record, the cause of a miss, and the branch gate with its Parked outcome. Every run and number in the walkthrough is still invented, except the two facts marked (real). The “needs”, “outputs” and “stores” fields, and some “why here” text, are this page’s summary of the diagram and its explanation. A second page, <a class="pagelink" href="#kaggle">On a Kaggle competition</a>, shows how a competition drives the same cycle.</p>
+</header>
+</div>
+<div class="wrap" id="hd-kaggle" hidden>
+<header>
+  <div>
+    <p class="label">The same cycle, driven by a competition</p>
+    <h1 style="margin-top:7px">Levers outside, puzzles inside</h1>
+    <p class="lead">A competition hands the researcher most of step 0, hides part of the measure, and publishes what others have measured. The cycle stays the same. What changes is what drives it: a ledger of levers decides what to try next, and a puzzle opens only when a measurement surprises the researcher. Press Play to follow an invented competition through the diagram, and see what each box needs, does, produces and stores.</p>
+  </div>
+  <p class="status"><b>First version, untested as a whole.</b> The base cycle is unchanged and lives on <a class="pagelink" href="#base">page one</a>. This page shows only what a competition changes about how that cycle is driven. The competition in the walkthrough is invented and shaped like name-that-llm; every run and number is invented too. Two things are real in kind: offsets that depend on the training regime, and a public lineage that published its ablations (their sizes here are invented). Built from <span class="mono">kaggle_adaptation.md</span>, <span class="mono">applied_example_kaggle.md</span> and <span class="mono">strong_inference_kaggle_workflow.drawio</span>. The “needs”, “outputs” and “stores” fields are this page’s summary of the adaptation.</p>
 </header>
 </div>
 
@@ -259,7 +304,7 @@ select { max-width: 100%; }
       <span><i style="background:var(--before)"></i>Written before the run</span>
       <span><i style="background:var(--run)"></i>The run</span>
       <span><i style="background:var(--after)"></i>After the result</span>
-      <span><i style="background:var(--panel);box-shadow:inset 0 3px 0 var(--recycle)"></i>Run not clean</span>
+      <span data-only="base"><i style="background:var(--panel);box-shadow:inset 0 3px 0 var(--recycle)"></i>Run not clean</span>
       <span>Arrow keys step, space plays</span>
     </div>
   </div>
@@ -269,7 +314,7 @@ select { max-width: 100%; }
   <div class="bench">
     <div class="map-box">
       <svg id="map" viewBox="0 -26 1030 676" role="group" aria-label="The cycle. Select any box to read about it."></svg>
-      <div class="map-foot">
+      <div class="map-foot" id="mapfoot">
         <span><span class="swatch" style="border-color:var(--flow)"></span>Next step</span>
         <span><span class="swatch" style="border-color:var(--back)"></span>Back to an earlier step</span>
         <span><span class="swatch" style="border-color:var(--recycle)"></span>Recycle</span>
@@ -277,10 +322,22 @@ select { max-width: 100%; }
         <span><span class="swatch" style="border-color:var(--read);border-top-style:dashed"></span>Read or write the tree or the loop record</span>
         <span><span class="dotkey"></span>A Popper rule applies here</span>
       </div>
+      <div class="map-foot" id="mapfoot-kaggle" hidden>
+        <span><span class="swatch" style="border-color:var(--flow)"></span>Next step</span>
+        <span><span class="swatch" style="border-color:var(--back)"></span>Back edge</span>
+        <span><span class="swatch" style="border-color:var(--recycle)"></span>Into a puzzle</span>
+        <span><span class="swatch" style="border-color:var(--read);border-top-style:dashed"></span>Read or write</span>
+        <span><span class="swatch" style="border-color:var(--out-line);border-top-style:dashed"></span>A lever goes blocked</span>
+        <span><span class="swatch" style="border-color:var(--flow);border-top-style:dashed"></span>Tested by the next pair</span>
+        <span><span class="swatch" style="border-color:var(--new-obj)"></span>To the person</span>
+        <span><i style="display:inline-block;width:16px;height:10px;margin-right:5px;vertical-align:middle;background:var(--step-bg);border:1px dashed var(--step-line)"></i>Support work (K1, C3)</span>
+        <span><i style="display:inline-block;width:16px;height:10px;margin-right:5px;vertical-align:middle;border:1px dashed var(--muted)"></i>The inner loop, a puzzle run on the base cycle</span>
+      </div>
     </div>
     <aside id="readout" aria-live="polite"></aside>
   </div>
 
+  <div id="pg-base">
   <section id="notebook-sec">
     <div class="sec-head">
       <h2>The notebook, as of this moment</h2>
@@ -388,7 +445,96 @@ select { max-width: 100%; }
     </div>
   </section>
 
-  <footer>Built from <span class="mono">strong_inference_workflow.drawio</span>, <span class="mono">workflow_explanation.md</span>, <span class="mono">applied_example.md</span>, <span class="mono">applied_example_2.md</span> and <span class="mono">applied_example_3.md</span> at commit <span class="mono">a08d12e</span>. Neither example reaches “Several rivals, or undecided”, or step 8’s edge back to “Know the field”, so those two paths never light up. Example 1 never reaches the branch gate and example 2 answers it Yes once, so nobody is ever Parked here; <span class="mono">applied_example_3.md</span> walks a branch to Parked, and this page does not trace it. The walkthrough also leaves two things dark on purpose: “Refine questions” and its edges, because the moment at “Answer questions” covers the refining, and the green tree edges, because the tree is read and written throughout.</footer>
+  <footer>Built from <span class="mono">strong_inference_workflow.drawio</span>, <span class="mono">workflow_explanation.md</span>, <span class="mono">applied_example.md</span>, <span class="mono">applied_example_2.md</span> and <span class="mono">applied_example_3.md</span> at commit <span class="mono">a08d12e</span>. Neither example reaches “Several rivals, or undecided”, or step 8’s edge back to “Know the field”, so those two paths never light up. Example 1 never reaches the branch gate and example 2 answers it Yes once, so nobody is ever Parked here; <span class="mono">applied_example_3.md</span> walks a branch to Parked, and this page does not trace it. The walkthrough also leaves two things dark on purpose: “Refine questions” and its edges, because the moment at “Answer questions” covers the refining, and the green tree edges, because the tree is read and written throughout. A second page, <a class="pagelink" href="#kaggle">On a Kaggle competition</a>, shows how a competition drives the same cycle.</footer>
+  </div>
+  <div id="pg-kaggle" hidden>
+  <section>
+    <div class="sec-head">
+      <h2>The notebook, as of this moment</h2>
+      <p>The same notebook as on page one, with the panels a competition adds: the ledger of levers, the pairs of local and public scores, and the levers that are blocked. Nothing is erased. Scrub the timeline and watch it grow.</p>
+    </div>
+    <div id="kobjective"></div>
+    <div class="book">
+      <div class="side">
+        <div class="shelf">
+          <h3>Lever ledger</h3>
+          <p class="hint">A view of the tree: every lever is a question. Public size is what other people measured, under other conditions. Saturation is the gain of the last two runs against twice the family’s noise floor. Blocked levers are listed first, by gain.</p>
+          <div class="tw" style="border:0"><div id="kledger"></div></div>
+        </div>
+        <div class="shelf">
+          <h3>Pairs per regime</h3>
+          <p class="hint">Every submission yields a pair: the local estimate written before, the public score after. Offset is public minus local. The first pair in a regime is that regime’s calibration. A later pair is inside tolerance when its offset differs from the recorded one by less than the tolerance, and on the edge counts as outside.</p>
+          <div class="tw" style="border:0"><div id="kpairs"></div></div>
+        </div>
+        <div class="shelf">
+          <h3>Questions and hypotheses</h3>
+          <p class="hint">The base’s logical tree, for the lever questions and the puzzle. A lever question holds one hypothesis and the placeholder. A puzzle holds rivals.</p>
+          <div id="ktree"></div>
+        </div>
+      </div>
+      <div class="side">
+        <div class="shelf">
+          <h3>Loop record</h3>
+          <p class="hint">The base’s five rows, plus two this adaptation adds: the pairs per regime, and the looks per adoption on the dev set. Rebuilt from the records and never edited by hand. Not read for tuning before fifteen or twenty reviewed runs.</p>
+          <div id="krec"></div>
+        </div>
+        <div class="shelf">
+          <h3>Findings</h3>
+          <p class="hint">What nobody predicted. A finding suggests a question and supports nothing yet. Select a stage in its trail to jump there.</p>
+          <div id="kfinds"></div>
+        </div>
+        <div class="shelf">
+          <h3>Blocked levers</h3>
+          <p class="hint">A lever whose best estimate needs an asset that does not exist, or what a constraint forbids, is still written. It carries the constraint, the gain, the cost and the proposal that would unblock it.</p>
+          <div id="kblocked"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>What a competition changes</h2>
+      <p>The cycle, steps 0 to 10, is the same, and so are its gates, the tree, the path of a finding, the branch gate and the Parked outcome. A competition changes six things about how the cycle is driven. Everything here is inference from the base workflow, from the first real run of the harness and from Kaggle practice, not from the reading notes. Rules marked as first guesses are not tuned.</p>
+    </div>
+    <div class="tw"><table>
+      <thead><tr><th>What changes</th><th>The rule</th><th>Where it sits in the base cycle</th></tr></thead>
+      <tbody>
+        <tr><td>1. What a competition fixes before step 0</td><td>The measure is partly hidden: the public board scores a sample of the test set, and prior work carries public scores. Step 0 writes the metric, the target and its margin above the board, the deadline, the hard caps, the submission form and the final-selection rule, written before the first submission and never by the public score alone. Submissions per day and calendar time are watched, not sized against. A plan whose worst case exceeds what remains of a hard cap is cut before it opens.</td><td>Step 0, and the budget it already fixes.</td></tr>
+        <tr><td>2. Two loops: levers outside, puzzles inside</td><td>The outer loop is a ledger of levers: public size, local size, saturation, cost per point. A lever question has one hypothesis, a prediction with a size and a cost, and the placeholder; its outcome excludes only below the prediction minus the family’s floor, and more seeds decide a result between. A puzzle opens only on a surprise measured here: a missed rung that repeats on a second rung of the same lever, a pair outside tolerance, or a plateau where the public work says there is room. Two lever questions stay open on different levers while the ledger holds two unsaturated levers.</td><td>Step 3’s gate decides lever or puzzle. The ledger is a view of the tree, rendered beside the loop record.</td></tr>
+        <tr><td>3. Bootstrapping from public work</td><td>A person builds a frontier baseline as support work, not a hypothesis, which anchors the ledger. Every public contribution enters the ledger as settled under other conditions: a candidate rung with a size, not knowledge. Its first local run is a transfer test. The reading answers three questions per lever: has someone measured it, what size would it predict here, which levers are missing.</td><td>Steps 1 and 2, the know-the-field loop. The first local run of a seeded rung is a lever question at step 3.</td></tr>
+        <tr><td>4. Calibration: the local measurement against the board</td><td>Every submission yields a pair, tagged by family and training regime. The first pair in a regime is its calibration: an offset and a tolerance (first guess 0.03). A later pair inside tolerance confirms the offset for free. A pair outside opens a calibration puzzle with a stock family of rivals. The protocol changes only as the outcome of such a puzzle, never on a single miss. Local decides ranking; the board decides calibration and the final pick. A holdout is scored only when a lever is adopted, and the looks are counted.</td><td>Two rows added to the loop record, read at steps 3, 5 and 6. The puzzle is a puzzle at step 3. The protocol change is support work, tested by the next pair. The base’s “regime-offset” cause at step 9 records the same thing.</td></tr>
+        <tr><td>5. Really trying, and what blocks a lever</td><td>“Objective wrong” fires only when every lever is saturated or blocked, the reading for “no path reaches” has run at least twice since the last lever was added and found nothing, and no open puzzle has budget left. A lever whose best estimate needs an asset that does not exist, or what a constraint forbids, is written as blocked, with its gain, cost and the proposal that would unblock it. For data, the proposal starts with a cheap pilot.</td><td>The objective gate at the end of the cycle, and step 2 when the reading is run.</td></tr>
+        <tr><td>6. What the harness’s records hold</td><td>A lever question is a question with kind lever. The ledger is a rendered table over lever questions. A pair is fields on a submitted experiment, tagged by regime. The offset and tolerance are fields on the phase. A calibration puzzle is a question with kind puzzle and the stock rivals pre-filled. Blocked is a hypothesis status with a constraint and a proposal. The hard caps are the objective’s constraints. The “really trying” test is a check the render runs over the ledger and the reading log.</td><td>Nothing new in the cycle. This is how the instance is built.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="two">
+    <div>
+      <div class="sec-head"><h2>What stays out of the first version</h2><p>Each of these waits for fifteen or twenty reviewed runs on the instance.</p></div>
+      <ul class="plain">
+        <li>Per-regime tolerances other than the first guess</li>
+        <li>An automatic cost-per-point ranking. Whoever picks the next question reads the ledger and says why, as step 3’s discounted gain and corrected cost already require</li>
+        <li>Any portfolio rule beyond keeping two lever questions open</li>
+        <li>Adversarial validation as a standing check. It is worth adding once the holdout exists</li>
+      </ul>
+    </div>
+    <div>
+      <div class="sec-head"><h2>What to record to judge this adaptation</h2><p>These are the numbers that will say whether the adaptation pays for its rules.</p></div>
+      <ul class="plain">
+        <li>Points per GPU hour and per dollar, for each lever</li>
+        <li>The pairs of local and public score per regime, and how many fell outside tolerance</li>
+        <li>How many runs were lever runs and how many were puzzle runs</li>
+        <li>How many times “no path reaches” fired, and what followed</li>
+        <li>How many looks at the dev set each adoption took</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>Built from <span class="mono">kaggle_adaptation.md</span>, <span class="mono">applied_example_kaggle.md</span> and <span class="mono">strong_inference_kaggle_workflow.drawio</span> as committed together with this page. The walkthrough leaves several paths dark on purpose, because the example never takes them: the “Undecided” exit of the rung gate, the second missed rung that opens a puzzle, the plateau trigger, a survivor with its step 10, the next submission that tests C3’s prediction, the inside-tolerance exit with its adoption, the person, and Stop. Two moves are not drawn as edges, because the example’s order has no edge for them: from C2 to K2 (the example narrates the reading before the pairs, and the diagram reaches C1 from K1) and from L1 to L4 (L4 follows only a rung that met its prediction and is a new local best). Each is marked on its moment, and the dot does not travel there. The base cycle, steps 4 to 9, is one box here; select it for a link to page one.</footer>
+  </div>
+
 </div>
 
 <script>
@@ -804,14 +950,471 @@ const EX2 = {cycles:["Round 1","Round 2"], trace:[
 
 const EXAMPLES = [EX1, EX2];
 
+/* ---------- Page two: a Kaggle competition ---------- */
+/* Helpers for the ops this page adds. The base's helpers above are reused as they are. */
+const lev = (id, patch) => ({op:"lev", id, patch});
+const pair = (id, regime, phase, local, pub) => ({op:"pair", id, regime, phase, local, pub});
+const judge = (id, tol, verdict, say) => ({op:"judge", id, tol, verdict, say});
+const blk = (id, name, constraint, gain, cost, proposal) => ({op:"blk", id, name, constraint, gain, cost, proposal});
+const kobj = (text, stop, facts, gpu, usd) => ({op:"obj", text, stop, facts, meters:[
+  {l:"GPU hours", k:"gpu", max:gpu, f:(v) => String(v)}, {l:"Money", k:"usd", max:usd, f:(v) => "$" + v.toFixed(2)}, {l:"Submissions", k:"subs", max:null, watch:true, f:(v) => String(v)}]});
+const spent = (gpu, usd, subs) => ({op:"used", gpu, usd, subs});
+const KREC = [["gain","Gain ratio"],["miss","Misses"],["floor","Noise floor"],["rescue","Rescues"],["cost","Cost ratio"],["pairs","Pairs per regime"],["looks","Looks per adoption"]], KRECN = Object.fromEntries(KREC);
+
+
+const KNODES = {
+  K0: {kind:"step",
+    x:14,y:54,w:172,h:130,
+    tt:["K0. The competition", "fixes the objective"],
+    sub:["metric, target, deadline,", "hard caps, submission form,", "final-selection rule"],
+    tag:"K0",
+    name:"The competition fixes the objective",
+    when:"before",
+    needs:"What the competition publishes: the metric, the board, the deadline, the caps and the submission form.",
+    does:"Writes most of step 0 from what the competition fixes: the metric; the target and its margin above the board (the board moves, so the margin is rewritten when it does); the deadline; the hard caps (GPU hours per week, money the person allows); the submission form (a notebook that runs within limits, with the internet off, on a hidden test set); and the final-selection rule, written before the first submission and never by the public score alone. Submissions per day and calendar time are watched, not sized against. A plan whose worst case exceeds what remains of a hard cap is cut before it opens.",
+    outputs:"The objective, stop criterion and budget of step 0, with the items above.",
+    stores:"The root of the tree, as at step 0, and the final-selection rule.",
+    why:"The measure is partly hidden. The public board scores a sample of the test set, so the public score is a stand-in with sampling noise of its own, and the final standing is decided on the rest. The final pick therefore cannot rest on the public score alone, and the rule is fixed before any score can tempt.",
+    src:"Adaptation, section 1, on the base’s step 0. Inference from the first real run and from Kaggle practice."},
+  K1: {kind:"step",
+    x:14,y:218,w:172,h:87,
+    tt:["K1. Frontier baseline"],
+    sub:["support work: a running", "baseline near the best", "public result that fits", "the caps. No id."],
+    tag:"K1",
+    name:"Frontier baseline (support work)",
+    when:"before",
+    needs:"The caps from K0, and the best public result that fits them.",
+    does:"A person builds a running baseline at or near the best public result that fits the caps. It is support work in the base’s sense: not a hypothesis, recorded as such, with no id. Nothing below its rung is a question.",
+    outputs:"A running baseline with a local score, and its first submission, which goes to C1 as a pair.",
+    stores:"A line in the notebook marked support work. It anchors the ledger.",
+    why:"Reading is unusually cheap and precise on a competition, so the first rung is not worth a question: someone has already measured it.",
+    src:"Adaptation, section 3, on steps 1 and 2. Support work is the base workflow’s term.",
+    support:true},
+  K2: {kind:"step",
+    x:14,y:315,w:172,h:115,
+    tt:["K2. Seed the ledger", "from public ablations"],
+    sub:["each public size enters as", "settled under other", "conditions: a candidate", "rung, not knowledge"],
+    tag:"K2",
+    name:"Seed the ledger from public ablations",
+    when:"before",
+    needs:"The reading of public notebooks, forum posts and earlier projects, and the baseline.",
+    does:"Every public contribution enters the ledger as settled under other conditions: the researcher’s reading class (b), a candidate rung with a size, not knowledge. The reading asks, per lever: has someone measured it, what size would it predict here, and which levers are missing. The first local run of a seeded rung is a transfer test. The gain predicted for it is the public size, discounted by the loop record’s running ratio once there is one.",
+    outputs:"A ledger with one row per lever, the public size and its source filled in.",
+    stores:"The ledger.",
+    why:"Chamberlin: first full facts, then interpretations. On a competition the facts include other people’s measured contributions. Most public notebooks are forks of one lineage, so their numbers are one-sided; a lever nobody has measured is where the budget should go.",
+    src:"Adaptation, section 3. Chamberlin, through the base workflow."},
+  ledger: {kind:"store",
+    x:234,y:312,w:161,h:164,
+    tt:["Lever ledger"],
+    sub:["a view of the tree:", "every lever is a question", "", "public size, source", "local size, saturation", "cost per point", "status: open, saturated", "or blocked"],
+    tag:"Store",
+    name:"Lever ledger",
+    when:"all",
+    needs:"Seeded at K2. Updated at L3, and by what step 10 measures for a survivor. Read at L1 and by the “really trying” check.",
+    does:"A view of the tree, rendered beside the loop record: every lever is a question. Per lever: its contribution as the public work measured it, with the source and the conditions; its contribution as this project measured it; its saturation, the gain of its last two runs against twice the family’s floor; its cost per point; and its status, open, saturated or blocked. Blocked levers are listed by gain.",
+    outputs:"Read at L1 to pick the next lever question, and by the check for “really trying”. The plateau trigger reads it: a plateau where the public work says there is room (its public sizes show the room) opens a puzzle.",
+    stores:"Nothing of its own. It is a rendered table over the lever questions.",
+    why:"A competition asks which lever gives the most points per unit of cost, and the ledger keeps that question visible. It is Chamberlin’s “several agencies in varying proportions”, made the main loop instead of one outcome.",
+    src:"Adaptation, section 2, and the table in section 6. Inference.",
+    never:" as a moment of its own: it is seeded at K2 and read at L1"},
+  record: {kind:"store",
+    x:234,y:176,w:161,h:122,
+    tt:["Loop record"],
+    sub:["the base’s five rows plus:", "pairs per regime,", "looks per adoption"],
+    tag:"Store",
+    name:"Loop record, with two rows added",
+    when:"all",
+    needs:"The base’s fields that already exist, written at step 9. This adaptation adds the pairs from C1 and the looks counted at adoption (inside tolerance, or a calibration puzzle’s exit).",
+    does:"The base’s five rows (gain ratio, misses with their cause, noise floor per family, rescues, cost ratio) plus two: the (local, public) pairs per regime, with their offset and tolerance, and the looks per adoption on the dev set. It is derived and never edited by hand.",
+    outputs:"Read at steps 3, 5 and 6 as in the base, and at L1.",
+    stores:"Seven rows. It outlives the competition, as the base’s does.",
+    why:"The offset between the local measurement and the board is not one number: it depends on the training regime, so the pairs are kept per regime. The dev set is read many times, which flatters the best of those reads, so the looks are counted. With few runs both rows hold anecdotes, and nothing is tuned on them before fifteen or twenty reviewed runs.",
+    src:"Adaptation, section 4, on the base’s loop record. Inference from the first real run.",
+    never:" as a moment of its own: it is written at C2, L4 and step 9"},
+  L1: {kind:"step",
+    x:234,y:57,w:290,h:91,
+    tt:["L1. Pick the next lever question"],
+    sub:["step 3, kind lever. Gain shown discounted, cost", "corrected. Two open lever questions on different", "levers while two are unsaturated."],
+    tag:"L1 · step 3",
+    name:"Pick the next lever question",
+    when:"before",
+    needs:"The ledger and the loop record, read by the green edges. Open findings. What remains of each hard cap.",
+    does:"Step 3, with kind lever. Decides each open finding first, as the base says. Then picks the lever question, with its expected gain shown discounted by the loop record’s running ratio and its cost corrected by the cost ratio. Keeps two open lever questions on different levers whenever the ledger holds two unsaturated levers, so no single line takes the budget (first version). No branch takes more than half of what remains. A plan whose worst case exceeds what remains of a hard cap is cut before it opens. When the best estimate needs an asset that does not exist, or what a constraint forbids, the lever is written as blocked. Every cycle the objective gate is asked.",
+    outputs:"A lever question: one hypothesis with a prediction that has a size and a cost, the placeholder, and a branch budget.",
+    stores:"The question in the tree, with its kind and its branch budget.",
+    why:"Step 3’s gate decides lever or puzzle, as the base says. A competition asks which lever gives the most points per unit of cost, so most questions here are levers, and puzzles are the minority. The first real run opened a puzzle on day one, and that is the failure this rule answers.",
+    src:"Adaptation, sections 2 and 5, on the base’s step 3. Inference."},
+  L2: {kind:"step",
+    x:588,y:57,w:175,h:94,
+    tt:["L2. One rung"],
+    sub:["one hypothesis, a prediction", "with size and cost, the", "placeholder, no rival tree.", "Run through steps 5 to 9."],
+    tag:"L2",
+    name:"One rung of a lever",
+    when:"before",
+    needs:"The lever question from L1 and the last rung measured on this lever.",
+    does:"Writes one hypothesis, a prediction with a size and a cost, and the placeholder; there is no rival tree. Runs it through the base’s steps 5 to 9. The outcome table excludes only below the prediction minus the family’s noise floor, since a shortfall inside the floor is the base’s miss cause “noise”, not a refutation. Between the two the rung is undecided. The plan is a ladder: the next rung is written after the last one is measured.",
+    outputs:"A measured rung: a local gain, a cost and a clean-run check.",
+    stores:"The rung’s hypothesis, prediction and result, in the tree.",
+    why:"A lever is a thing that can be changed and measured, so one hypothesis at a time is enough. The floor rule stops a result that close to the prediction from being read as a refutation when it could be noise around it.",
+    src:"Adaptation, section 2, on the base’s steps 5 to 9. Inference."},
+  G1: {kind:"gate",
+    cx:676,cy:225,w:133,h:70,
+    tt:["Rung met its", "prediction?"],
+    tag:"Gate",
+    name:"Rung met its prediction?",
+    when:"after",
+    needs:"The rung’s result and its outcome table.",
+    does:"Asks whether the measured gain met the prediction. Three exits. Yes: the lever is updated at L3. No: the rung missed, and G2 asks whether this is the second miss on the lever. Undecided, a result between the prediction minus the floor and the prediction: it counts neither as met nor as a miss, and the edge goes back to L2 for more seeds on the same rung, within its budget.",
+    outputs:"Yes: L3. No: G2. Undecided: back to L2.",
+    stores:"Nothing new. The outcome is already in the record.",
+    why:"A result inside the floor is not evidence either way. More seeds on the same rung decide it, which costs less than a new rung.",
+    src:"Adaptation, section 2. Inference. The walkthrough never takes the Undecided edge."},
+  G2: {kind:"gate",
+    cx:514,cy:225,w:147,h:84,
+    tt:["Second", "missed rung,", "same lever?"],
+    tag:"Gate",
+    name:"Second missed rung on the same lever?",
+    when:"after",
+    needs:"A missed rung, and the earlier rungs of the same lever.",
+    does:"Asks whether the miss repeats on a second rung of the same lever. No: one missed rung is a miss with a cause, logged in the loop record, and the cycle goes back to L1. Yes: the lever should pay and does not, so it becomes a puzzle and gets the base’s rival tree, branch budget and branch gate.",
+    outputs:"No: back to L1, with the miss logged. Yes: the inner loop.",
+    stores:"On No, a miss with its cause in the loop record.",
+    why:"One miss usually has a cause that needs no tree, and the cause is written down. A tree is for a surprise that survives a second look.",
+    src:"Adaptation, section 2. Inference. The base allows a lever that misses to become a puzzle at once; on a competition this waits for the miss to repeat."},
+  L3: {kind:"step",
+    x:606,y:284,w:140,h:63,
+    tt:["L3. Update ledger", "with the measured", "gain"],
+    tag:"L3",
+    name:"Update the ledger with the measured gain",
+    when:"after",
+    needs:"A rung that met its prediction.",
+    does:"A rung that meets its prediction updates the ledger at once: the lever’s measured local size, saturation and cost per point. It does not adopt the lever. A lever is adopted only when its pair is inside tolerance, or when a calibration puzzle has explained why it is not, and until then a better local score is not yet a better board score. The next box submits the rung’s model only if it is a new local best: above the previous best by more than the family’s floor. A rung inside the floor of the best is not a new best and goes no further.",
+    outputs:"An updated ledger row.",
+    stores:"The ledger.",
+    why:"The local measurement can be flattered, and the board is the check on it. Updating the ledger at once keeps the record current, and waiting for the pair keeps a local gain from being counted as a board gain.",
+    src:"Adaptation, sections 2 and 4. Inference."},
+  L4: {kind:"step",
+    x:606,y:365,w:140,h:38,
+    tt:["L4. Submit the", "new local best"],
+    tag:"L4",
+    name:"Submit the new local best",
+    when:"after",
+    needs:"The new local best, and its local estimate written before.",
+    does:"Submits every new local best, for the pair and for the final-selection rule. A new local best is one above the previous best by more than the family’s noise floor; a gain inside the floor is not a new best and is not submitted. Local decides ranking, because the board cannot rank candidates less than its own noise apart. The board decides calibration and the final pick.",
+    outputs:"A public score for the submission.",
+    stores:"The submission, with its estimate and its score. The looks row of the loop record.",
+    why:"The public board has noise of its own, so it ranks poorly between close candidates, but it is the only check on the local measurement.",
+    src:"Adaptation, section 4. Inference."},
+  C1: {kind:"step",
+    x:812,y:57,w:196,h:70,
+    tt:["C1. A submission", "yields a pair"],
+    sub:["local before, public after,", "tagged by family and regime"],
+    tag:"C1",
+    name:"A submission yields a pair",
+    when:"after",
+    needs:"A submission’s local estimate, written before, and its public score, after.",
+    does:"Pairs the local estimate with the public score and tags the pair with its family and training regime. Writes the pairs row of the loop record.",
+    outputs:"A pair: local, public, offset and regime.",
+    stores:"The pairs row of the loop record.",
+    why:"The offset between the local measurement and the board depends on the regime. A pair is the only way to know it, and every submission yields one at no extra cost.",
+    src:"Adaptation, section 4. The base has no such record; the harness keeps it as a phase."},
+  GF: {kind:"gate",
+    cx:910,cy:180,w:126,h:70,
+    tt:["First pair in", "this regime?"],
+    tag:"Gate",
+    name:"First pair in this regime?",
+    when:"after",
+    needs:"The pair, and the pairs already kept for its regime.",
+    does:"Asks whether this is the regime’s first pair. Yes: it is the regime’s calibration, and it is no question, only one submission (C2). No: it is tested against the regime’s offset (the next gate).",
+    outputs:"Yes: C2. No: the tolerance gate.",
+    stores:"Nothing.",
+    why:"The first pair in a regime has nothing to be compared with, so it sets the offset instead of testing it.",
+    src:"Adaptation, section 4. Inference."},
+  C2: {kind:"step",
+    x:812,y:236,w:168,h:59,
+    tt:["C2. The pair is the", "regime’s calibration"],
+    tag:"C2",
+    name:"The pair is the regime’s calibration",
+    when:"after",
+    needs:"The first pair in a regime.",
+    does:"Writes the pair’s offset and a tolerance (first guess 0.03, from the board’s noise of about 0.02 and the local interval) to the protocol’s record, per regime. A calibration from one model is assumed to hold for the next model in the same regime, and the next submission tests that for free. A lever whose pair calibrates its regime is adopted on its local gain, since there is no offset yet to agree with; the next pair in the regime tests both.",
+    outputs:"An offset and a tolerance for the regime. A lever whose pair this is, the first in its regime, is adopted on its local gain, and the loop goes back to L1.",
+    stores:"The regime’s offset and tolerance, in the protocol’s record and the pairs row.",
+    why:"The offset is not one number, and a regime needs its own. The tolerance is a first guess that is not tuned.",
+    src:"Adaptation, section 4. First guess. The base has no such record; the harness keeps it as a phase."},
+  GT: {kind:"gate",
+    cx:896,cy:348,w:140,h:70,
+    tt:["Inside", "tolerance?"],
+    tag:"Gate",
+    name:"Inside tolerance?",
+    when:"after",
+    needs:"A later pair, and its regime’s offset and tolerance.",
+    does:"A pair is inside when its offset differs from the regime’s recorded offset by less than the tolerance, and on the edge counts as outside (first version). Inside: the offset is confirmed for free, which is the test that would otherwise be run as a two-rival puzzle, and the lever is adopted: the holdout is scored once and the looks are counted. Outside: a surprise, so a calibration puzzle opens automatically with a stock family of rivals, and the lever is not adopted until the puzzle leaves with a corroborated cause for why its pair is outside.",
+    outputs:"Inside: the lever is adopted, and the loop goes back to L1. Outside: the inner loop.",
+    stores:"On Inside, the holdout score and the looks per adoption. On Outside, a finding for the surprise.",
+    why:"The causes of a gap are few and known, so the rivals are pre-filled and no one has to invent them.",
+    src:"Adaptation, section 4: a lever is adopted when its pair agrees. Inference."},
+  trig: {kind:"box",
+    x:451,y:463,w:161,h:74,
+    tt:["Three triggers"],
+    sub:["a second missed rung on", "one lever; a pair outside", "tolerance; a plateau where", "public work says there is room"],
+    tag:"Inner loop",
+    name:"Three triggers of a puzzle",
+    when:"before",
+    needs:"A surprise measured here.",
+    does:"A puzzle opens only on one of three surprises: a lever that should pay and does not, when the miss repeats on a second rung of the same lever; a local-to-public gap outside tolerance; or a plateau where the public work says there is room (the ledger’s public sizes show the room).",
+    outputs:"A puzzle, with the base’s rival tree, branch budget and branch gate.",
+    stores:"A node of the tree, with kind puzzle.",
+    why:"The base answers a why-question by exclusion, which is slow. Here a puzzle is only for what a ledger cannot answer.",
+    src:"Adaptation, section 2. Inference."},
+  riv: {kind:"box",
+    x:623,y:463,w:164,h:74,
+    tt:["Calibration puzzle:", "stock rivals"],
+    sub:["split leakage, data drift,", "class-prior shift, regime", "inflation, public-set noise"],
+    tag:"Inner loop",
+    name:"The calibration puzzle’s stock rivals",
+    when:"before",
+    needs:"A pair outside tolerance.",
+    does:"A calibration puzzle starts from a family of rivals that is already written, because the causes are few and known: leakage through the split, a drift in the training data, a class-prior shift, regime inflation (the local measurement rewards something the test does not), and public-set noise. The base’s rules still apply: each rival states a prediction with a size, the compound rivals are marked, and the placeholder stays.",
+    outputs:"Rivals with predictions, for the base cycle’s steps 5 to 9.",
+    stores:"The node’s live hypotheses.",
+    why:"Inventing rivals costs time, and these five are the ones that explain a gap between a local score and a board.",
+    src:"Adaptation, section 4. Inference from the first real run, whose first cycle was this tree."},
+  base: {kind:"step",
+    x:451,y:547,w:336,h:43,
+    tt:["The base cycle, steps 4 to 9"],
+    sub:["with branch budget and the gate “Branch progressing?”"],
+    tag:"Inner loop",
+    name:"The base cycle, steps 4 to 9",
+    when:"during",
+    needs:"The rivals, a branch budget, and the cheap runs that separate them.",
+    does:"Runs the base’s steps 4 to 9 unchanged on the puzzle: write and prune the family, derive the predictions, design the crucial experiment, run it, analyze beyond the hypotheses, record the results. Then the branch gate asks whether the branch is progressing. On this page the base cycle is one box, because the base cycle is unchanged. Its own diagram and walkthrough are on page one.",
+    outputs:"A record of exclusions and survivors, and the gate’s answer: Yes, back to step 4; No, Parked.",
+    stores:"As the base: the tree, the findings and the loop record.",
+    why:"This adaptation changes what drives the cycle, not the cycle. A puzzle here is a branch of the base’s tree like any other.",
+    src:"Base workflow, steps 4 to 9 and the branch gate.",
+    link:{"href": "#base", "text": "Open page one, the base cycle"}},
+  surv: {kind:"out",
+    x:448,y:620,w:158,h:63,
+    tt:["Survivor"],
+    sub:["goes to step 10, a measured", "use; only what is measured", "there updates the ledger"],
+    tag:"Outcome",
+    name:"Survivor",
+    when:"after",
+    needs:"A surviving explanation.",
+    does:"A survivor does not update the ledger directly. It goes on to the base’s step 10, a measured use, and only what is measured there updates the ledger. Then the cycle goes back to L1 through the ledger. When the survivor is regime inflation or leakage, it also goes to C3, the protocol change. A calibration puzzle leaving with a corroborated cause adopts the lever whose pair it explained: the adoption happens at this exit, the holdout is scored once and the looks are counted. If the next pair contradicts the cause, the puzzle reopens and the adoption reopens with it.",
+    outputs:"A measured use, then a ledger update. For a calibration puzzle, the adoption of the lever whose pair it explained, and C3 for a cause of regime inflation or leakage.",
+    stores:"Through step 10, project knowledge. Then the ledger.",
+    why:"A survivor is the best of its family, not proven. Step 10 tests it by a use, which is a new prediction and can fail.",
+    src:"Base workflow, step 10. Adaptation, section 2.",
+    never:" in this example: the only puzzle is parked"},
+  park: {kind:"out",
+    x:626,y:620,w:161,h:56,
+    tt:["Parked", "back to L1"],
+    sub:["Parked returns to step 3"],
+    tag:"Outcome",
+    name:"Parked",
+    when:"after",
+    needs:"A No from the branch gate.",
+    does:"The base’s rule: write the current best answer, mark the standing rivals untested (never excluded), set the branch’s status to parked, and go back to step 3, which here is L1. A parked branch is reopened only by a new finding that bears on it. A calibration puzzle parked with a corroborated cause adopts the lever whose pair it explained: the adoption happens at the parking, whatever the cause, the holdout is scored once and the looks are counted. If the next pair contradicts the cause, the puzzle reopens and the adoption reopens with it. Parking changes nothing else by itself: a calibration puzzle parked with a corroborated cause of regime inflation or leakage goes on to C3.",
+    outputs:"The cycle goes back to L1. A calibration puzzle parked with a corroborated cause adopts the lever whose pair it explained, and a cause of regime inflation or leakage goes on to C3.",
+    stores:"The branch status parked, the best answer, and the rivals marked untested.",
+    why:"Parking is not abandoning. The tree keeps everything, and only the loop moves its budget.",
+    src:"Base workflow, the branch gate and Parked. Adaptation, section 4."},
+  C3: {kind:"step",
+    x:826,y:648,w:182,h:84,
+    tt:["C3. Protocol change"],
+    sub:["a new phase (support", "work); old exclusions", "keep their tag; a prediction", "on the next pair’s offset"],
+    tag:"C3",
+    name:"Protocol change (support work)",
+    when:"before",
+    needs:"A calibration puzzle whose cause is regime inflation or leakage.",
+    does:"The protocol changes only as the outcome of a calibration puzzle whose survivor is regime inflation or leakage, never on a single miss. A protocol change is a new phase. Exclusions made under the old phase keep its tag, and are reopened as findings as the base says. The change is support work for the measurement, recorded as such, and it carries a prediction about the next pair with an outcome table, so the next submission tests it at no cost. The first pair under the new phase is also that phase’s calibration, so the prediction is about its offset. The lever whose pair was outside tolerance was already adopted at the puzzle’s exit, not here. C3 is reached from a survivor, or from a parked puzzle, with a corroborated cause of regime inflation or leakage.",
+    outputs:"A new phase, and a prediction about its first pair’s offset.",
+    stores:"The phase, the prediction and its outcome table.",
+    why:"A protocol that is changed on a single miss would move with the noise. A change tested by the next pair costs nothing extra.",
+    src:"Adaptation, section 4. Inference.",
+    support:true},
+  blocked: {kind:"out",
+    x:234,y:506,w:164,h:88,
+    tt:["Blocked lever"],
+    sub:["still written, with the", "constraint or missing asset,", "gain, cost and a proposal", "(data: a cheap pilot, itself", "blocked under a rule like D3)"],
+    tag:"Outcome",
+    name:"Blocked lever",
+    when:"after",
+    needs:"A lever whose best estimate needs an asset that does not exist, or what a constraint forbids.",
+    does:"Writes the hypothesis with status blocked, so it is not forgotten. The entry carries the constraint or the missing asset, the expected gain and cost, and the proposal that would unblock it: generate N passages at about $X, harvest a free pool, relabel. For data, the proposal starts with a cheap pilot, measured on the learning curve. Under a constraint like D3 the pilot is itself blocked: it is written as the proposal, and runs only once the person lifts the constraint for the pilot’s amount.",
+    outputs:"A ledger row marked blocked, listed by gain.",
+    stores:"The hypothesis with status blocked, its constraint, gain, cost and proposal.",
+    why:"A lever that cannot run today may be the best one on the board. Writing it down lets the person decide whether to lift a constraint, instead of finding out at the end.",
+    src:"Adaptation, section 5. The constraint D3 is the instance’s, not the base theory’s."},
+  person: {kind:"stop",
+    x:234,y:614,w:164,h:48,
+    tt:["Person"],
+    sub:["lift a constraint, lower", "the target, or stop"],
+    tag:"Person",
+    name:"The person decides",
+    when:"after",
+    needs:"The report of blocked levers, each with its constraint and gain.",
+    does:"The person lifts a constraint, lowers the target, or stops. Nothing in the harness decides this.",
+    outputs:"A decision.",
+    stores:"Nothing.",
+    why:"Only the person owns the constraints and the target.",
+    src:"Adaptation, section 5.",
+    never:" in this example: the objective gate never fires"},
+  objg: {kind:"gate",
+    cx:98,cy:494,w:168,h:88,
+    tt:["Objective met,", "budget spent,", "or wrong?"],
+    tag:"Gate",
+    name:"Objective met, budget spent, or objective wrong?",
+    when:"after",
+    needs:"The stop criterion and budget, the ledger, the reading log, and the open puzzles.",
+    does:"The base’s gate, asked each cycle. The third reason, “objective wrong”, fires only when all three hold: every lever in the ledger is saturated or blocked; the reading for “no path reaches” has been run at least twice since the last lever was added to the ledger, and found nothing; and no open puzzle has budget left. “No open path reaches the target” is a line in the record, not a stop.",
+    outputs:"Yes: Stop. No: back to L1. When “objective wrong” fires: the report goes to the person.",
+    stores:"Budget used so far.",
+    why:"A stop for lack of a path is easy to reach, and it would end the project over a lever nobody tried. These three conditions make the harness keep looking before it says the objective is wrong.",
+    src:"Adaptation, section 5. This is the base’s “really trying” rule, with the ledger as the list of levers."},
+  stop: {kind:"stop",
+    x:18,y:558,w:161,h:80,
+    tt:["Stop"],
+    sub:["final selection by the", "K0 rule. If “objective", "wrong”: list blocked", "levers, constraint, gain"],
+    tag:"Stop",
+    name:"Stop and report",
+    when:"after",
+    needs:"The whole tree, the ledger and the final-selection rule from K0.",
+    does:"Chooses the final submission by the rule written at K0, never by the public score alone. When the reason to stop is “objective wrong”, the report lists the blocked levers, each with the constraint that blocks it and the gain it was estimated to carry, and goes to the person.",
+    outputs:"The report, and the chosen submission.",
+    stores:"Everything stays.",
+    why:"The private board decides the final standing, and it is hidden, so the pick must not chase the public score.",
+    src:"Adaptation, sections 1 and 5, on the base’s Stop.",
+    never:" in this example: the objective gate never fires"},
+  really: {kind:"box",
+    x:14,y:648,w:210,h:83,
+    tt:["Really trying"],
+    sub:["“objective wrong” fires only", "if every lever is saturated", "or blocked, the reading ran", "at least twice, and no puzzle", "has budget left"],
+    tag:"Rule",
+    name:"Really trying",
+    when:"after",
+    needs:"The ledger, the reading log, and the open puzzles.",
+    does:"A rule, not a step. It is the three conditions of the objective gate’s third reason, listed on the box above it. It is the base’s “really trying” rule, with the ledger as the list of levers.",
+    outputs:"The gate’s answer on its third reason.",
+    stores:"Nothing.",
+    why:"“No open path reaches the target” is a line in the record, not a stop.",
+    src:"Adaptation, section 5.",
+    never:" as a moment of its own: it is a rule the gate reads"},
+};
+
+/* Edges of page two: path, colour family, optional labels */
+const KEDGES = [
+  ["K0>K1", "M179 183V218", "flow"],
+  ["K1>K2", "M98 305V315", "flow"],
+  ["K1>C1", "M14 261H6V17H861V57", "flow", {"x": 301, "y": 14, "t": "the baseline’s pair", "a": "middle"}],
+  ["K2>ledger", "M186 383H234", "read"],
+  ["ledger>L1", "M396 407H402V148", "read"],
+  ["record>L1", "M280 176V148", "read"],
+  ["L1>L2", "M525 102H588", "flow"],
+  ["L2>G1", "M676 152V190", "flow"],
+  ["G1>G2", "M609 225H588", "flow", {"x": 598, "y": 220, "t": "No", "a": "middle"}],
+  ["G1>L2", "M642 208V152", "back", {"x": 638, "y": 196, "t": "more seeds", "a": "end"}, {"x": 638, "y": 208, "t": "on this rung", "a": "end"}],
+  ["G1>L3", "M676 260V284", "flow", {"x": 682, "y": 272, "t": "Yes"}],
+  ["L3>L4", "M676 348V365", "flow"],
+  ["L3>ledger", "M606 327H396", "read"],
+  ["L4>record", "M606 384H428V260H396", "read"],
+  ["L4>C1", "M746 384H794V92H812", "flow"],
+  ["G2>L1", "M514 183V148", "back", {"x": 530, "y": 162, "t": "a miss with a cause,"}, {"x": 530, "y": 173, "t": "logged in the"}, {"x": 530, "y": 184, "t": "loop record"}],
+  ["G2>frame", "M514 267V442", "recycle", {"x": 520, "y": 354, "t": "puzzle"}],
+  ["C1>GF", "M910 127V144", "flow"],
+  ["GF>C2", "M910 214V236", "flow", {"x": 916, "y": 225, "t": "Yes"}],
+  ["GF>GT", "M973 180H997V348H966", "flow", {"x": 982, "y": 263, "t": "No"}],
+  ["C2>L1", "M812 264H788V43H336V57", "back", {"x": 330, "y": 31, "t": "a lever whose pair calibrates its regime", "a": "end"}, {"x": 330, "y": 42, "t": "is adopted on its local gain", "a": "end"}],
+  ["GT>L1", "M826 348H780V49H392V57", "back", {"x": 560, "y": 28, "t": "inside: confirms the offset for free;", "a": "middle"}, {"x": 560, "y": 39, "t": "the lever is adopted (holdout scored once, looks counted)", "a": "middle"}],
+  ["GT>frame", "M896 382V477H798", "recycle", {"x": 847, "y": 460, "t": "calibration puzzle,", "a": "middle"}, {"x": 847, "y": 472, "t": "stock rivals", "a": "middle"}],
+  ["C3>C1", "M1008 690H1016V32H910V57", "test", {"x": 1012, "y": 250, "t": "the next submission tests it", "a": "middle", "r": 1}],
+  ["frame>surv", "M526 603V620", "flow"],
+  ["frame>park", "M707 603V620", "flow"],
+  ["surv>ledger", "M448 648H434V435H396", "read"],
+  ["surv>C3", "M526 684V704H826", "flow", {"x": 635, "y": 723, "t": "calibration puzzle, cause", "a": "middle"}, {"x": 635, "y": 735, "t": "regime inflation or leakage", "a": "middle"}],
+  ["park>C3", "M788 662H826", "flow", {"x": 802, "y": 622, "t": "calibration puzzle, cause", "a": "start"}, {"x": 802, "y": 634, "t": "regime inflation or leakage", "a": "start"}],
+  ["C3>L1", "M917 732V740H420V148", "back", {"x": 775, "y": 737, "t": "the loop continues", "a": "middle"}],
+  ["blocked>L1", "M399 550H420V148", "back", {"x": 434, "y": 300, "t": "pick another"}, {"x": 434, "y": 312, "t": "lever"}],
+  ["ledger>frame", "M396 396H500V442", "recycle", {"x": 497, "y": 408, "t": "plateau where", "a": "end"}, {"x": 497, "y": 419, "t": "the public work", "a": "end"}, {"x": 497, "y": 430, "t": "says there is", "a": "end"}, {"x": 497, "y": 441, "t": "room", "a": "end"}],
+  ["park>L1", "M707 676V693H420V148", "back"],
+  ["L1>objg", "M234 85H195V442H98V450", "flow", {"x": 146, "y": 456, "t": "each cycle", "a": "middle"}],
+  ["objg>L1", "M182 494H204V113H234", "back", {"x": 193, "y": 489, "t": "No", "a": "middle"}],
+  ["L1>blocked", "M234 137H213V541H234", "dim"],
+  ["blocked>person", "M316 594V614", "newobj"],
+  ["objg>stop", "M98 538V558", "flow", {"x": 104, "y": 548, "t": "Yes"}],
+  ["objg>person", "M140 516H186V634H234", "newobj", {"x": 190, "y": 575, "t": "objective wrong", "a": "middle", "r": 1}],
+];
+
+/* ---------- Example: an invented competition ---------- */
+const KEX = {cycles:["Set-up","Two lever questions","A pair outside tolerance","Parked, and a new phase"], trace:[
+ {c:0,n:"K0",t:"The competition fixes most of step 0. The metric is balanced accuracy on a hidden test set. The target is 0.74 public, against 0.72 at the top of the board today. The deadline is six weeks, the hard caps are 30 GPU hours and $30, and the submission is a notebook with the internet off. The final-selection rule is written now, before any submission: among experiments whose public score is within 0.01 of the best, submit the one with the highest local mean. Submissions and calendar time are watched, not sized against.",
+  w:[kobj("Reach a public balanced accuracy of 0.74 on the hidden test set. The competition is invented, shaped like name-that-llm: 18 models to tell apart.","A submission scores 0.74 public. Otherwise stop at the deadline, or when a plan would pass a hard cap.",[["Metric","Balanced accuracy on a hidden test set. The public board scores about 40 % of it."],["Target","0.74 public. The top of the board is 0.72 today, so the margin is 0.02. The board moves, so the margin is rewritten when it does."],["Deadline","Six weeks (invented)."],["Hard caps","30 GPU hours and $30. A plan whose worst case exceeds what remains of either is cut before it opens. GPU time is invented at $0.80 an hour."],["Submission form","A notebook, internet off, at most 9 hours. So no single run costs more than 9 GPU hours."],["Final-selection rule","Among experiments whose public score is within 0.01 of the best, submit the one with the highest local mean. Never the public score alone."],["Watched, not sized against","Submissions (five a day) and calendar time."]],30,30)]},
+ {c:0,n:"K1",t:"A person builds the frontier baseline: the lineage’s recipe, reproduced at the caps. It is support work, not a hypothesis, so it takes no id. Local 0.58, submitted at 0.55 public. It cost 4 GPU hours. An earlier train-only model, 1 GPU hour, read 0.31 local and 0.31 public. Both submissions go to C1 as pairs. (The example narrates the reading before the pairs. The diagram reaches C1 only from K1, so the pairs come first here, and K2 follows.)",
+  w:[spent(4,3.2,0)]},
+ {c:0,n:"C1",t:"Each submission yields a pair, tagged with its family and training regime. The baseline’s pair is 0.58 local and 0.55 public, in the regime “pool-trained”: offset, public minus local, −0.03. The earlier model’s pair is 0.31 and 0.31 in the regime “train-only”: offset 0. The two go through the same path, in one pass here. Real in kind, from the instance: pool-trained models read 0.02 to 0.05 high, and train-only models land within ±0.02. Support work so far: 5 GPU hours, $4.00, two submissions.",
+  w:[pair("P1","Pool-trained",1,0.58,0.55),pair("P2","Train-only",1,0.31,0.31),spent(5,4,2)]},
+ {c:0,n:"GF",a:"Yes, both.",t:"Each is the first pair in its regime, so each is that regime’s calibration, not a test. Neither opens a question."},
+ {c:0,n:"C2",t:"Each pair’s offset is written to the protocol’s record for its regime, with a tolerance of 0.03 (a first guess, from the board’s noise of about 0.02 and the local interval). A calibration from one model is assumed to hold for the next model in the same regime, and the next submission tests that for free.",
+  w:[judge("P1",0.03,"calibration","first pair in the regime: its calibration"),judge("P2",0.03,"calibration","first pair in the regime: its calibration"),
+     rec("pairs","Pool-trained, phase 1: one pair (0.58, 0.55), offset −0.03, tolerance 0.03. Train-only: one pair (0.31, 0.31), offset 0, tolerance 0.03. Both are calibrations.")]},
+ {c:0,n:"K2",jump:1,t:"The reading finds a public lineage at 0.66 that published its ablations (real in kind: the instance’s reading found them; the sizes here are invented). By the researcher’s reading classes each size is class (b): a candidate rung, not knowledge. Each enters the ledger as settled under other conditions. Thin-class data comes from posts at the top of the board, not from the lineage. The diagram draws no edge from C2 to K2: in the diagram the baseline’s path leaves K1 for C1, and the ledger is seeded from K1.",
+  w:[lev("pool",{name:"Pool size",pub:"+0.03, lineage",status:"open"}),lev("two",{name:"Two-stage recipe",pub:"+0.02, lineage",status:"open"}),lev("bb",{name:"Backbone size",pub:"+0.015, lineage",status:"open"}),lev("blend",{name:"Blend heads",pub:"+0.005 each, lineage",status:"open"}),lev("tta",{name:"Test-time structure",pub:"about 0, lineage",status:"open"}),lev("thin",{name:"Thin-class data",pub:"+0.05, top-of-board posts",status:"open"})]},
+ {c:1,n:"L1",hops:["ledger","L1"],t:"Remaining: 25 GPU hours and $26. The first question is a lever question: “Does a larger stage-1 pool gain at least 0.03 local here, within 9 GPU hours?” It is a how-much question under a known lever, so lever, not puzzle. H401 predicts at least +0.03 over the baseline’s 0.58, three times the family’s floor of 0.01, at a predicted cost of 8 GPU hours. There is no loop-record ratio yet, so no discount. Branch budget: one run, at most 9 GPU hours and $7.20. Half of what remains is 12.5 hours, so the half rule holds. The ledger holds more than one unsaturated lever, so a second lever question opens on a different lever: “Does a different stage-2 schedule gain at least 0.02 local, within 5 hours?” H402 comes from the two-stage recipe’s +0.02, at a predicted cost of 4 hours and a branch budget of one run, 5 hours, $4.00. The worst case for both is 14 of 25 hours, so no line can take the budget.",
+  w:[node("N401","Does a larger stage-1 pool gain at least 0.03 local here, within 9 GPU hours?",null,"Lever question. Branch budget: one run, 9 GPU hours, $7.20."),hyp("H401","N401","A larger stage-1 pool gains at least 0.03 local"),none("N401"),
+     node("N402","Does a different stage-2 schedule gain at least 0.02 local, within 5 hours?",null,"Lever question. Branch budget: one run, 5 GPU hours, $4.00."),hyp("H402","N402","A different stage-2 schedule gains at least 0.02 local"),none("N402")]},
+ {c:1,n:"L2",t:"H401’s rung. The prediction is written first, with an outcome table. A gain of at least 0.03 corroborates and excludes nothing. At least 0.02 and below 0.03 is undecided, inside the floor of the prediction. Below 0.02 excludes H401 at the size 0.03. Every outcome is mapped and the last row excludes, so the check at step 6 passes. E401 runs with assertions first (the stage-1 pool changed, no test row in it, the loss falls): 7 GPU hours, $5.60. Local 0.62, a gain of +0.04. The run is clean.",
+  w:[pred("H401","Local gain over 0.58 of at least 0.03, at a cost of 8 GPU hours"),run("E401","N401","Larger stage-1 pool, assertions first"),res("E401","0.62 local, gain +0.04; 7 GPU hours"),spent(12,9.6,2),
+     rec("gain","H401: 0.04 ÷ 0.03 = 1.33."),rec("floor","Two-stage family ±0.01, three seeds on the baseline. The pool-trained family: one run each (thin)."),rec("rescue","0."),rec("cost","H401: 7 ÷ 8 = 0.88.")]},
+ {c:1,n:"G1",a:"Yes.",t:"A gain of 0.04 against a prediction of 0.03: the prediction is met."},
+ {c:1,n:"L3",t:"The ledger takes the pool lever’s measured gain at once: +0.04 local, one run, above 0.02, so not saturated, at 1.75 GPU hours per 0.01. The lever is not adopted yet. A lever is adopted only when its pair is inside tolerance, or when a calibration puzzle has explained why it is not, so the holdout is not scored here. The next box submits the rung’s model only if it is a new local best, above the previous best by more than the family’s floor; this one is the first rung, so it is.",
+  w:[lev("pool",{local:"+0.04, phase 1",sat:"One run, above 0.02: not saturated",cpp:"1.75 h per 0.01"})]},
+ {c:1,n:"L2",hops:["ledger","L1","L2"],t:"Back through the ledger to L1, where H402 was opened with H401, and on to its rung, built on E401’s model. Outcome table: at least 0.02 corroborates; at least 0.01 and below 0.02 is undecided; below 0.01 excludes H402 at the size 0.02. E402: 4.5 GPU hours, $3.60. Local 0.625, a gain of +0.005, which is below 0.01. It is also within the floor (0.01) of E401’s 0.62, so it is not a new local best. The run is clean. Total used: 16.5 hours, $13.20, support included.",
+  w:[pred("H402","Local gain over E401’s model of at least 0.02, at a cost of 4 GPU hours"),run("E402","N402","Different stage-2 schedule, on E401’s model"),res("E402","0.625 local, gain +0.005; 4.5 GPU hours"),spent(16.5,13.2,2),
+     rec("gain","H401: 0.04 ÷ 0.03 = 1.33. H402: 0.005 ÷ 0.02 = 0.25. Running median 0.79, from two values (thin)."),rec("cost","H401: 7 ÷ 8 = 0.88. H402: 4.5 ÷ 4 = 1.13. Together 11.5 ÷ 12 = 0.96.")]},
+ {c:1,n:"G1",a:"No.",t:"A gain of +0.005 is below 0.01, the prediction minus the floor: the rung missed."},
+ {c:1,n:"G2",a:"No: the first miss on this lever.",t:"One missed rung is a miss with a cause, not a tree. The miss is −0.015 against 0.02, with cause source-conditions: the lineage’s +0.02 for the recipe did not transfer to a schedule change here, and nothing blames an auxiliary. H402 is excluded at the size 0.02, under phase 1. A puzzle on a lever needs the miss to repeat on a second rung of it.",
+  w:[set("H402","excluded","E402, phase 1"),rec("miss","1: E402, −0.015 against 0.02, cause source-conditions."),lev("two",{local:"+0.005",sat:"One run below 0.02: a second saturates it",cpp:"9 h per 0.01"})]},
+ {c:1,n:"blocked",hops:["L1","blocked"],t:"Back at L1 (step 3), the gain-ratio row has a running median of 0.79. The reading says thin-class data is what the top of the board uses, and the free pools are exhausted. The best estimate for that lever needs what a constraint forbids, so the lever is written as blocked, not left out. H403, status blocked. The constraint that blocks it forbids paid generated text. Expected gain: +0.05 raw, +0.04 discounted (0.05 × 0.79), for about $120 (9,000 passages). The gain is read off posts, and no local run has measured it (thin). The full spend is four times the $30 cap, so the cap rule would cut it even without the constraint. The proposal is a pilot of 300 passages for $4, measured on the learning curve. The pilot is itself blocked: it runs only once the person lifts the constraint for that amount. $4 fits the $16 that remains.",
+  w:[node("N403","Does thin-class data gain at least 0.05?",null,"Lever question, blocked."),hyp("H403","N403","Thin-class data gains about +0.05","blocked"),
+     blk("H403","Thin-class data","The no-paid-text constraint forbids paid generated text. The full spend is also four times the $30 cap.","+0.05 estimated, +0.04 discounted (0.05 × 0.79)","About $120 for 9,000 passages: $24 per 0.01, $30 discounted","A pilot of 300 passages for $4, measured on the learning curve. It is itself blocked, and runs only once the person lifts the constraint for that amount."),
+     lev("thin",{pub:"+0.05 estimated, +0.04 discounted (top-of-board posts)",cpp:"$24 per 0.01, $30 discounted",status:"blocked"})]},
+ {c:2,n:"L4",hops:["L1","L4"],jump:1,t:"Back to L1 to pick another lever, and then E401’s model, the local best, is submitted, for the pair and for the final-selection rule. E402’s 0.625 is within the floor of it, so not a new best, and it is not submitted. The local estimate was written before: 0.62. Public score: 0.56. The example runs E402 and writes H403 before this submission, and the diagram draws no edge from L1 to L4, since L4 follows only a rung that met its prediction and is a new local best.",
+  w:[rec("looks","None yet. E401 is not adopted until its pair is explained. 3 candidates have been compared on the dev set (baseline, E401, E402)."),spent(16.5,13.2,3)]},
+ {c:2,n:"C1",t:"A pair: 0.62 local, 0.56 public, tagged with the family and the regime pool-trained. Offset, public minus local: −0.06.",
+  w:[pair("P3","Pool-trained",1,0.62,0.56)]},
+ {c:2,n:"GF",a:"No.",t:"The regime already has a pair, the baseline’s. This one is tested against the regime’s offset, not used as a calibration."},
+ {c:2,n:"GT",a:"No: outside.",t:"The regime’s recorded offset is −0.03, with tolerance 0.03. This pair’s offset differs from it by 0.03, which is not less than the tolerance, so it is outside. Seen another way: local says +0.04 over the baseline and the board says +0.01. This is a surprise measured here. It is logged at step 8 as finding F401.",
+  w:[judge("P3",0.03,"outside","deviates 0.03 from the regime’s −0.03"),find("F401","E401’s pair fell outside tolerance: offset −0.06 against the regime’s −0.03 ± 0.03. Local says +0.04 over the baseline, the board +0.01. Source: E401’s submission.","open","seen at step 8"),
+     rec("pairs","Pool-trained, phase 1: (0.58, 0.55) offset −0.03; (0.62, 0.56) offset −0.06, outside. Tolerance 0.03. Train-only: (0.31, 0.31) offset 0, tolerance 0.03.")]},
+ {c:2,n:"trig",t:"A pair outside tolerance is one of the three triggers. Step 3 promotes F401: it is a surprise measured here, so a local explanandum, and not evidence for any answer. A calibration puzzle opens automatically, kind puzzle. Branch budget: three runs, about 1.5 GPU hours and $1.20, the probes counting as runs. Expected gain: none directly. It restores the measurement that decides between levers.",
+  w:[find("F401",null,"promoted","promoted at step 3: a surprise measured here"),node("N404","Why does E401’s pool-trained pair fall outside tolerance?",null,"Calibration puzzle. Branch budget: three runs, about 1.5 GPU hours, $1.20.")]},
+ {c:2,n:"riv",t:"The stock family, written before any run. H404 to H407 are pairwise compound: each can hold in part, and near-duplicates in the pool and leakage through the split in particular can both hold. H408 is exclusive with each of them: if the deviation is noise, nothing remains to explain. The cheap steps are P401, an analytic check of the public set’s noise (no per-row data, so no bootstrap); P402, a train-versus-pool classifier, 0.5 hours; and A401, a re-score of the pool rows by prompt overlap, 0.5 hours. H406 has no step among the three: it is written, and stays untested.",
+  w:[hyp("H404","N404","Leakage through the split"),hyp("H405","N404","Drift in the training data"),hyp("H406","N404","Class-prior shift"),hyp("H407","N404","Regime inflation: the pool holds near-duplicates of training prompts"),hyp("H408","N404","Public-set noise"),none("N404"),
+     pred("H404","At least 3 % of validation rows have a near-duplicate (similarity above 0.9) in the training folds"),pred("H405","A classifier of training rows against pool rows reaches AUC of at least 0.65"),pred("H406","Class frequencies of pool and training differ by a total variation of at least 0.10"),pred("H407","At least 10 % of pool rows are near-duplicates of training prompts, enough for about +0.03 local"),pred("H408","The deviation of 0.03 is within 2 standard errors of one public score"),
+     run("P401","N404","Analytic standard error of one public score"),run("P402","N404","Train-versus-pool classifier, 0.5 hours"),run("A401","N404","Re-score the pool rows by prompt overlap, 0.5 hours"),set("H406","untested",null,"H406 written, untested")]},
+ {c:2,n:"base",t:"Steps 5 to 9 on the three cheap runs, each with an outcome table written first. P401: the binomial standard error of one public score is √(0.56 × 0.44 ÷ 1,600) = 0.012, and 0.03 is 2.5 standard errors, so H408 is excluded. P402: AUC 0.60, between 0.55 and 0.65, so H405 is undecided. A401: 0.4 % of validation rows have a training near-duplicate, so H404 is excluded; 12 % of pool rows are near-duplicates of training prompts, so H407 is corroborated, not excluded. Used: 1.0 GPU hour, $0.80. Two assumptions are thin: the exclusion of H408 assumes the two models’ correctness correlates by at least 0.5, and the link between the duplicate share and the size of the inflation is assumed, not measured.",
+  w:[res("P401","SE 0.012; 0.03 is 2.5 standard errors"),res("P402","AUC 0.60"),res("A401","0.4 % of validation rows; 12 % of pool rows"),set("H408","excluded","P401, phase 1"),set("H405","undecided","P402"),set("H404","excluded","A401, phase 1"),set("H407","corroborated","A401"),spent(17.5,14,3),
+     rec("gain","H401 1.33, H402 0.25. Puzzle, parked: not applicable. Running median 0.79."),rec("miss","1: E402, −0.015, cause source-conditions. E401’s public gain is not a prediction missed, since no public prediction was written; the pair has its own row."),rec("floor","±0.01, two-stage family. Pool-trained: unmeasured (thin)."),rec("cost","12.5 hours against 13 planned, 0.96; $10.00 against $10.40.")]},
+ {c:2,n:"base",a:"No: the budget is spent.",t:"The gate “Branch progressing?” reads three numbers. Rivals added against excluded over the last three runs: 0 added, 2 excluded (H404, H408). Realized against predicted gain: not applicable to a calibration puzzle. Branch budget used: 3 of 3 runs. The answer is No, because the budget is spent."},
+ {c:3,n:"park",t:"The puzzle is Parked. Its answer is written: the pool-trained estimate reads high because 12 % of pool rows are near-duplicates of training prompts; drift undecided; class prior untested; noise and split leakage excluded. It is reopened only by a finding that bears on it. Parking changes nothing by itself. The pool lever is adopted here, at the puzzle’s exit, as the adaptation says: a lever is adopted when its pair is inside tolerance or a calibration puzzle has explained why it is not, and a puzzle has explained the pair when it leaves with a corroborated cause, as a survivor or parked, whatever the cause. If the next pair contradicts the cause, the puzzle reopens and the adoption reopens with it. 3 candidates were compared on the dev set before it, and the holdout is scored once, at this adoption (the holdout score is not given). H401 stays corroborated; its local +0.04 is a phase 1 number, so the ledger shows both the local and the public gain.",
+  w:[set("H401","corroborated","E401"),lev("pool",{local:"+0.04 phase 1; public +0.01"}),rec("looks","Pool lever, adopted at the parking: 3 candidates on the dev set (baseline, E401, E402), holdout scored once.")]},
+ {c:3,n:"C3",t:"The protocol change the corroborated cause justifies, as support work for the measurement, with no hypothesis id. Phase 2: pool rows are deduplicated against training prompts. Exclusions made under phase 1 (H402, H404, H408) keep its tag. It carries a prediction about the next pool-trained pair: the phase 2 offset lands at −0.01 or above, at least 0.02 closer to zero than phase 1’s −0.03. At least −0.01 corroborates near-duplicates as the main cause; strictly between −0.03 and −0.01 is undecided; at most −0.03 excludes them and reopens the puzzle with drift and prior shift still standing. The first phase 2 pair is also phase 2’s calibration. The inflation sizes are guesses (thin). The pool lever was adopted at the parking, not here. The base cycle gains no edge, and the example does not reach the next pair: it is still owed.",
+  w:[rec("pairs","Pool-trained, phase 1: (0.58, 0.55) offset −0.03; (0.62, 0.56) offset −0.06, outside. Pool-trained, phase 2: none yet, the prediction is owed. Train-only: (0.31, 0.31) offset 0. Tolerance 0.03.")]},
+ {c:3,n:"L1",t:"The loop continues. The ledger after five runs. No lever is saturated. Pool size has one run, above 0.02. The two-stage recipe has one run under 0.02, and a second would saturate it. Backbone size has never run. Blend heads and test-time structure are open and not asked. Thin-class data is blocked, and the ledger lists it first, by gain.",
+  w:[lev("blend",{note:"not asked"}),lev("tta",{note:"not asked"})]},
+ {c:3,n:"objg",a:"No: the gate does not fire.",t:"“No open path reaches the target” is a line in the record: best local 0.62 (E401’s; E402’s 0.625 is within the floor of it, so not a new best), offset −0.03 as recorded (E401’s own pair was −0.06), projected public 0.59 or lower, against a target of 0.74. The third reason, “objective wrong”, needs three things. Two levers are unsaturated, pool size and backbone, so the first does not hold. The reading for “no path reaches” has been run once since the last lever was added (H403); it must be run at least twice since then, and find nothing. The calibration puzzle is parked with its budget spent, so only the third would hold. For it to fire: pool size, backbone and the recipe each saturated, blend heads and test-time structure saturated or blocked, the reading run at least twice since the last lever was added (it has been run once) and found nothing, and no puzzle with budget. The report would then list H403 with its constraint and gain, and the person could lift the constraint, lower the target from 0.74, or stop. Total used: 17.5 GPU hours of 30, $14.00 of $30."},
+]};
+
 /* ---------- State ---------- */
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-let ex = EX1, pos = 0, view = null, timer = null, speed = 1, token = 0;
+let P = null, ex = EX1, pos = 0, view = null, timer = null, speed = 1, token = 0;
 const edgeEls = {}, nodeEls = {};
 
-const groupOf = (x) => KNOW.includes(x) ? "know" : x;
+const groupOf = (x) => P.group[x] || x;
 function edgeKey(a, b) {
   for (const k of [`${a}>${b}`, `${groupOf(a)}>${b}`, `${a}>${groupOf(b)}`, `${groupOf(a)}>${groupOf(b)}`]) if (edgeEls[k]) return k;
   return null;
@@ -819,13 +1422,17 @@ function edgeKey(a, b) {
 function pathOf(i) {
   if (i <= 0) return [];
   const e = ex.trace[i], stops = [ex.trace[i-1].n, ...(e.hops || [e.n])], keys = [];
-  for (let k = 1; k < stops.length; k++) { const key = edgeKey(stops[k-1], stops[k]); if (key) keys.push(key); else console.warn("No edge", stops[k-1], stops[k]); }
+  for (let k = 1; k < stops.length; k++) {
+    const a = stops[k-1], b = stops[k], key = edgeKey(a, b);
+    if (key) keys.push(key);
+    else if (a !== b && !e.jump && !(groupOf(a) === groupOf(b) && groupOf(a) !== a)) console.warn("No edge", a, b);   /* a moment marked jump is a move the diagram draws no edge for */   /* the same box twice, or two boxes inside one frame, need no edge */
+  }
   return keys;
 }
 
 /* Fold the trace up to a moment. Going backward just replays, so scrubbing is exact. */
 function fold(upto) {
-  const s = {objective:null, used:null, nodes:[], hyps:{}, runs:{}, finds:{}, rescues:[], hyg:[], know:{}, rec:{}, fresh:new Set(), lines:[]};
+  const s = {objective:null, used:null, nodes:[], hyps:{}, runs:{}, finds:{}, rescues:[], hyg:[], know:{}, rec:{}, levers:{}, pairs:{}, blocked:{}, fresh:new Set(), lines:[]};
   for (let i = 0; i <= upto; i++) {
     for (const o of ex.trace[i].w || []) {
       const now = i === upto; let line = null, mark = null;
@@ -844,7 +1451,11 @@ function fold(upto) {
       if (o.op === "rescue") { s.rescues.push(o.text); mark = "rescue" + (s.rescues.length - 1); line = "Rescue log entry added"; }
       if (o.op === "hyg") { s.hyg.push(o.text); mark = "hyg" + (s.hyg.length - 1); line = "Hygiene finding logged apart"; }
       if (o.op === "know") { s.know[o.id] = o; mark = o.id; line = "Project knowledge: " + o.text.split(". ")[0].replace(/\.$/, ""); }
-      if (o.op === "rec") { s.rec[o.row] = o.text; mark = "rec-" + o.row; line = "Loop record, " + RECN[o.row].toLowerCase() + ": " + o.text; }
+      if (o.op === "rec") { s.rec[o.row] = o.text; mark = "rec-" + o.row; line = "Loop record, " + P.recn[o.row].toLowerCase() + ": " + o.text; }
+      if (o.op === "lev") { s.levers[o.id] = {...(s.levers[o.id] || {id:o.id}), ...o.patch}; mark = "lev-" + o.id; line = "Ledger, " + s.levers[o.id].name.toLowerCase() + ": " + Object.keys(o.patch).map((k) => ({name:"named",pub:"public size",local:"local size",sat:"saturation",cpp:"cost per point",status:"status",note:"note"}[k] + " " + o.patch[k])).join("; "); }
+      if (o.op === "pair") { s.pairs[o.id] = {...o, tol:null, verdict:null}; mark = "pair-" + o.id; line = `Pair written: ${o.regime}, phase ${o.phase}, local ${o.local.toFixed(2)}, public ${o.pub.toFixed(2)}`; }
+      if (o.op === "judge") { Object.assign(s.pairs[o.id], {tol:o.tol, verdict:o.verdict, say:o.say}); mark = "pair-" + o.id; line = `Pair judged ${o.verdict}: ${o.say}`; }
+      if (o.op === "blk") { s.blocked[o.id] = o; mark = "blk-" + o.id; line = `${o.id} written as blocked, with its proposal`; }
       if (now) { if (mark) s.fresh.add(mark); if (line) s.lines.push(line); }
     }
   }
@@ -855,26 +1466,33 @@ function fold(upto) {
 const NS = "http://www.w3.org/2000/svg";
 function el(tag, attrs, parent, text) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; if (parent) parent.appendChild(e); return e; }
 function textLines(g, lines, cx, cy, cls) { const lh = 15, y0 = cy - (lines.length - 1) * lh / 2 + 4; lines.forEach((l, i) => el("text", {x:cx, y:y0 + i * lh, "text-anchor":"middle", class:cls}, g, l)); }
+function textBlock(g, tt, sub, cx, cy) {
+  const lh = 15, sh = 12.5, total = tt.length * lh + (sub ? sub.length * sh : 0);
+  let y = cy - total / 2 + 13;
+  tt.forEach((l) => { el("text", {x:cx, y, "text-anchor":"middle", class:"tt"}, g, l); y += lh; });
+  (sub || []).forEach((l) => { if (l) el("text", {x:cx, y:y - 1, "text-anchor":"middle", class:"sub"}, g, l); y += sh; });
+}
 function buildMap() {
   const svg = $("map");
-  el("rect", {x:175,y:28,width:280,height:150,class:"frame solid"}, svg);
-  el("text", {x:187,y:44,class:"frame-t"}, svg, "Know the field: loop until a question is worth pursuing");
-  el("rect", {x:648,y:138,width:344,height:258,class:"frame"}, svg);
-  el("text", {x:986,y:148,"text-anchor":"end",class:"frame-t"}, svg, "discovery phase");
+  svg.innerHTML = ""; svg.setAttribute("viewBox", P.viewBox); svg.setAttribute("aria-label", P.mapLabel);
+  for (const k in edgeEls) delete edgeEls[k];
+  for (const k in nodeEls) delete nodeEls[k];
+  P.frames(svg);
   const edges = el("g", {}, svg);
   const defs = el("defs", {}, svg);
-  for (const fam of ["flow","back","recycle","newobj","read"]) {
+  const FAM = {flow:"flow",back:"back",recycle:"recycle",newobj:"new-obj",read:"read",dim:"out-line",test:"flow"};
+  for (const fam in FAM) {
     const m = el("marker", {id:"a-"+fam, viewBox:"0 0 8 8", refX:7, refY:4, markerWidth:7, markerHeight:7, orient:"auto-start-reverse", markerUnits:"userSpaceOnUse"}, defs);
-    el("path", {d:"M0 0L8 4L0 8z", style:`fill:var(--${{flow:"flow",back:"back",recycle:"recycle",newobj:"new-obj",read:"read"}[fam]})`}, m);
+    el("path", {d:"M0 0L8 4L0 8z", style:`fill:var(--${FAM[fam]})`}, m);
   }
-  for (const [key, d, fam, ...labels] of EDGES) {
+  for (const [key, d, fam, ...labels] of P.edges) {
     edgeEls[key] = el("path", {d, class:`ed ${fam}`, "marker-end":`url(#a-${fam})`}, edges);
     edgeEls[key].dataset.fam = fam;
     for (const l of labels) { const t = el("text", {x:l.x, y:l.y, "text-anchor":l.a || "start", class:`el ${fam}`}, svg, l.t); if (l.r) t.setAttribute("transform", `rotate(-90 ${l.x} ${l.y})`); }
   }
-  for (const id in NODES) {
-    const n = NODES[id];
-    const g = el("g", {class:`mapnode ${n.kind}`, tabindex:0, role:"button", "aria-label":`${n.tag}: ${n.name}`}, svg);
+  for (const id in P.nodes) {
+    const n = P.nodes[id];
+    const g = el("g", {class:`mapnode ${n.kind}${n.support ? " support" : ""}`, tabindex:0, role:"button", "aria-label":`${n.tag}: ${n.name}`}, svg);
     g.addEventListener("click", () => inspect(id));
     g.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); inspect(id); } });
     nodeEls[id] = g;
@@ -883,12 +1501,14 @@ function buildMap() {
       const p = `${n.cx},${n.cy-n.h/2} ${n.cx+n.w/2},${n.cy} ${n.cx},${n.cy+n.h/2} ${n.cx-n.w/2},${n.cy}`;
       el("polygon", {points:p, class:"halo", style:`transform-origin:${cx}px ${cy}px`}, g); el("polygon", {points:p, class:"sh"}, g);
       textLines(g, n.tt, cx, cy, "tt");
-    } else if (n.kind === "tree" || n.kind === "loop") {
-      const rx = n.w/2, ry = 15, top = n.y + ry, bot = n.y + n.h - ry;
+    } else if (n.kind === "tree" || n.kind === "loop" || n.kind === "store") {
+      const rx = n.w/2, ry = n.kind === "store" ? 12 : 15, top = n.y + ry, bot = n.y + n.h - ry;
       const d = `M${n.x} ${top}A${rx} ${ry} 0 0 1 ${n.x+n.w} ${top}V${bot}A${rx} ${ry} 0 0 1 ${n.x} ${bot}Z`;
       el("path", {d, class:"sh"}, g);
       el("path", {d:`M${n.x} ${top}A${rx} ${ry} 0 0 0 ${n.x+n.w} ${top}`, fill:"none", class:"sh", style:"fill:none"}, g);
-      if (n.kind === "loop") {
+      if (n.kind === "store") {
+        textBlock(g, n.tt, n.sub, cx, n.y + n.h / 2 + 8);
+      } else if (n.kind === "loop") {
         el("text", {x:cx, y:n.y+50, "text-anchor":"middle", class:"tt", style:"font-size:14px"}, g, "Loop record");
         el("text", {x:cx, y:n.y+66, "text-anchor":"middle", class:"el", style:"fill:var(--ink)!important"}, g, "Never edited by hand");
         REC.forEach(([k, lab], i) => el("text", {id:"lr-" + k, x:cx, y:n.y+94+i*17, "text-anchor":"middle", class:"lr off"}, g, lab));
@@ -903,7 +1523,7 @@ function buildMap() {
       });
       }
     } else {
-      const rx = n.kind === "stop" ? 20 : 3;
+      const rx = n.kind === "stop" ? (n.h > 50 ? 20 : 10) : 3;
       el("rect", {x:n.x,y:n.y,width:n.w,height:n.h,rx,class:"halo",style:`transform-origin:${cx}px ${cy}px`}, g);
       el("rect", {x:n.x,y:n.y,width:n.w,height:n.h,rx,class:"sh"}, g);
       if (id === "s4" || id === "s5") {
@@ -914,7 +1534,8 @@ function buildMap() {
           el("rect", {x, y, width:w, height:34, class:"mini" + (t.startsWith("None") ? " ph" : "")}, g);
           (t.startsWith("None") ? ["None of","the above"] : [t]).forEach((l, j, a) => el("text", {x:x+w/2, y:y+21+(j-(a.length-1)/2)*12, "text-anchor":"middle", class:"mini-t"}, g, l));
         });
-      } else textLines(g, n.tt, cx, cy, "tt");
+      } else if (n.sub) textBlock(g, n.tt, n.sub, cx, cy);
+      else textLines(g, n.tt, cx, cy, "tt");
     }
     if (n.popper) { const px = n.kind === "gate" ? n.cx : n.x + n.w - 8, py = n.kind === "gate" ? n.cy - n.h/2 + 8 : n.y + 8; el("circle", {cx:px, cy:py, r:5, class:"pop"}, g); }
   }
@@ -926,7 +1547,7 @@ function paintMap() {
   for (let i = 1; i <= pos; i++) pathOf(i).forEach((k) => walked.add(k));
   for (const k in edgeEls) { edgeEls[k].classList.toggle("walked", walked.has(k)); edgeEls[k].classList.remove("taken","untaken"); }
   for (const id in nodeEls) { nodeEls[id].classList.toggle("now", id === e.n); nodeEls[id].classList.toggle("viewed", id === view && id !== e.n); }
-  if (NODES[e.n].kind === "gate" && pos < ex.trace.length - 1) {
+  if (P.nodes[e.n].kind === "gate" && pos < ex.trace.length - 1) {
     const nextE = ex.trace[pos + 1], chosen = edgeKey(e.n, (nextE.hops || [nextE.n])[0]);
     for (const k in edgeEls) if (k.startsWith(e.n + ">")) edgeEls[k].classList.add(k === chosen ? "taken" : "untaken");
   }
@@ -953,31 +1574,40 @@ function animate(keys) {
 /* ---------- Readout ---------- */
 const WHEN = {before:"Written before the run", during:"The run", after:"After the result", all:"Always open"};
 function fieldsHTML(n) {
+  const link = n.link ? `<p class="src"><a class="pagelink" href="${n.link.href}">${esc(n.link.text)}</a></p>` : "";
   const row = (k, v, cls) => `<div class="${cls || ""}"><dt>${k}</dt><dd>${esc(v)}</dd></div>`;
-  return `<dl class="fields">${row("Needs",n.needs)}${row("Does",n.does)}${row("Outputs",n.outputs)}${row("Stores",n.stores)}${row("Why here",n.why)}${n.popper ? row("Popper",n.popper,"pop-row") : ""}</dl><p class="src">${esc(n.src)}</p>`;
+  return `<dl class="fields">${row("Needs",n.needs)}${row("Does",n.does)}${row("Outputs",n.outputs)}${row("Stores",n.stores)}${row("Why here",n.why)}${n.popper ? row("Popper",n.popper,"pop-row") : ""}</dl><p class="src">${esc(n.src)}</p>${link}`;
 }
 function renderReadout(s) {
-  const e = ex.trace[pos], id = view || e.n, n = NODES[id];
+  const e = ex.trace[pos], id = view || e.n, n = P.nodes[id];
   let top;
   if (id === e.n) {
     const writes = s.lines.length ? `<div class="writes"><span class="label">Written to the notebook</span>${s.lines.map((l) => `<div>${esc(l)}</div>`).join("")}</div>` : `<p class="wrote-none">Nothing written to the notebook at this moment.</p>`;
-    top = `<div class="story"><span class="label">${esc(ex.cycles[e.c])} · what happens now</span>${e.a ? `<p class="answer">${esc(e.a)}</p>` : ""}<p>${esc(e.t)}</p>${writes}</div>`;
+    const jump = e.jump ? `<p class="note">The diagram draws no edge from the previous box to this one, so the dot does not travel.</p>` : "";
+    top = `<div class="story"><span class="label">${esc(ex.cycles[e.c])} · what happens now</span>${e.a ? `<p class="answer">${esc(e.a)}</p>` : ""}<p>${esc(e.t)}</p>${jump}${writes}</div>`;
   } else {
     const occ = ex.trace.map((t, i) => (t.n === id || (t.hops || []).includes(id)) ? i : -1).filter((i) => i >= 0);
-    const list = occ.length ? `<div class="occ">${occ.map((i) => `<button type="button" data-jump="${i}">${esc(ex.cycles[ex.trace[i].c].split(",")[0])} · ${i + 1}</button>`).join("")}</div>` : `<p>This example never reaches it${id === "tree" ? " as a moment of its own: it is written and read throughout" : id === "ref" ? " as a moment of its own: the moment at “Answer questions” covers it" : ""}.</p>`;
-    top = `<div class="story"><span class="label">Viewing this box. The walkthrough is paused at ${esc(NODES[e.n].tag.toLowerCase())}.</span>${occ.length ? "<p>Jump to a moment when it happens in this example:</p>" : ""}${list}<div><button type="button" id="backnow">Back to the current moment</button></div></div>`;
+    const list = occ.length ? `<div class="occ">${occ.map((i) => `<button type="button" data-jump="${i}">${esc(ex.cycles[ex.trace[i].c].split(",")[0])} · ${i + 1}</button>`).join("")}</div>` : `<p>This example never reaches it${id === "tree" ? " as a moment of its own: it is written and read throughout" : id === "ref" ? " as a moment of its own: the moment at “Answer questions” covers it" : (n.never || "")}.</p>`;
+    top = `<div class="story"><span class="label">Viewing this box. The walkthrough is paused at ${esc(P.nodes[e.n].tag.toLowerCase())}.</span>${occ.length ? "<p>Jump to a moment when it happens in this example:</p>" : ""}${list}<div><button type="button" id="backnow">Back to the current moment</button></div></div>`;
   }
   $("readout").innerHTML = `<div class="r-head"><span class="label">${esc(n.tag)}</span><span class="when ${n.when}">${WHEN[n.when]}</span><h2>${esc(n.name)}</h2></div>${top}${fieldsHTML(n)}`;
 }
 
 /* ---------- Notebook ---------- */
 const fr = (s, id) => s.fresh.has(id) ? " fresh" : "";
-function renderBook(s) {
+function renderObjective(box, s) {
   const o = s.objective;
-  const meter = (lab, u, b) => b == null ? "" : `<div class="meter">${lab} ${u == null ? "not yet reported" : u + " of " + b}<div class="bar"><i style="width:${u == null ? 0 : Math.round(100 * u / b)}%"></i></div></div>`;
-  $("objective").innerHTML = `<div class="o"><b>Objective.</b> ${esc(o.text)} <b>Stop when:</b> ${esc(o.stop)}</div><div class="meters">${meter("Runs", s.used && s.used.runs, o.runs)}${meter("Submits", s.used && s.used.subs, o.subs)}${meter("Days", s.used && s.used.days, o.days)}</div>`;
-
-  $("tree").innerHTML = s.nodes.length ? s.nodes.map((mapnode) => {
+  const meter = (m) => {
+    const u = s.used && s.used[m.k], f = m.f || String;
+    if (m.max == null) return m.watch ? `<div class="meter">${m.l} ${u == null ? "not yet reported" : f(u) + " so far, watched"}</div>` : "";
+    return `<div class="meter">${m.l} ${u == null ? "not yet reported" : f(u) + " of " + f(m.max)}<div class="bar"><i style="width:${u == null ? 0 : Math.min(100, Math.round(100 * u / m.max))}%"></i></div></div>`;
+  };
+  const meters = o.meters || [{l:"Runs", k:"runs", max:o.runs}, {l:"Submits", k:"subs", max:o.subs}, {l:"Days", k:"days", max:o.days}];
+  const facts = o.facts ? `<ul class="facts">${o.facts.map(([k, v]) => `<li><b>${esc(k)}.</b> ${esc(v)}</li>`).join("")}</ul>` : "";
+  box.innerHTML = `<div class="o"><b>Objective.</b> ${esc(o.text)} <b>Stop when:</b> ${esc(o.stop)}${facts}</div><div class="meters">${meters.map(meter).join("")}</div>`;
+}
+function treeHTML(s, emptyText) {
+  return s.nodes.length ? s.nodes.map((mapnode) => {
     const hs = Object.values(s.hyps).filter((h) => h.n === mapnode.id), rs = Object.values(s.runs).filter((r) => r.n === mapnode.id);
     const hrows = hs.map((h) => {
       const name = h.status === "placeholder" || h.status === "true" ? "none" : h.id;
@@ -986,10 +1616,20 @@ function renderBook(s) {
     }).join("");
     const rrows = rs.length ? `<div class="runs">${rs.map((r) => `<div class="run${fr(s, r.id)}"><span class="mono">${r.id}</span>${esc(r.text)}${r.res ? `: <b style="font-weight:600">${esc(r.res)}</b>` : ` <span class="pending">(designed, not yet run)</span>`}</div>`).join("")}</div>` : "";
     return `<div class="tnode${mapnode.parent ? " child" : ""}${fr(s, mapnode.id)}"><div class="q"><span class="mono">${mapnode.id}</span>${esc(mapnode.q)}</div>${mapnode.note ? `<p class="note">${esc(mapnode.note)}</p>` : ""}${hrows}${rrows}</div>`;
-  }).join("") : `<p class="empty">Empty. The first node opens when a question passes the gate after step 3.</p>`;
-
+  }).join("") : `<p class="empty">${emptyText}</p>`;
+}
+function findsHTML(s) {
   const fs = Object.values(s.finds);
-  $("finds").innerHTML = fs.length ? fs.map((f) => `<div class="f-card${fr(s, f.id)}"><div class="fh"><span class="mono" style="font-weight:500">${f.id}</span><span class="chip ${f.status}">${f.status}</span></div><p>${esc(f.text)}</p><div class="trail">${f.trail.map((t) => `<button type="button" data-jump="${t.i}" title="${esc(t.say)}">${esc(t.say.split(":")[0])}</button>`).join("")}</div></div>`).join("") : `<p class="empty">None yet. Step 8 logs the first one.</p>`;
+  return fs.length ? fs.map((f) => `<div class="f-card${fr(s, f.id)}"><div class="fh"><span class="mono" style="font-weight:500">${f.id}</span><span class="chip ${f.status}">${f.status}</span></div><p>${esc(f.text)}</p><div class="trail">${f.trail.map((t) => `<button type="button" data-jump="${t.i}" title="${esc(t.say)}">${esc(t.say.split(":")[0])}</button>`).join("")}</div></div>`).join("") : `<p class="empty">None yet. Step 8 logs the first one.</p>`;
+}
+function recHTML(s) {
+  return P.rec.map(([k, lab]) => `<div class="rec-row${fr(s, "rec-" + k)}"><span class="k">${lab}</span><span class="${s.rec[k] ? "" : "none"}">${s.rec[k] ? esc(s.rec[k]) : "not written yet"}</span></div>`).join("");
+}
+function renderBook(s) {
+  renderObjective($("objective"), s);
+  $("tree").innerHTML = treeHTML(s, "Empty. The first node opens when a question passes the gate after step 3.");
+  $("finds").innerHTML = findsHTML(s);
+  const fs = Object.values(s.finds);
 
   const logs = [...s.rescues.map((t, i) => `<p class="logline${fr(s, "rescue" + i)}"><span class="chip">rescue</span> ${esc(t)}</p>`), ...s.hyg.map((t, i) => `<p class="logline${fr(s, "hyg" + i)}"><span class="chip">hygiene</span> ${esc(t)}</p>`)];
   $("logs").innerHTML = logs.length ? logs.join("") : `<p class="empty">Clean so far.</p>`;
@@ -997,7 +1637,7 @@ function renderBook(s) {
   const ks = Object.values(s.know);
   $("know").innerHTML = ks.length ? `<ul>${ks.map((k) => `<li class="${fr(s, k.id)}">${esc(k.text)} <span class="runs-of">(${esc(k.by)})</span></li>`).join("")}</ul>` : `<p class="empty" style="color:var(--ink)">Empty. A corroboration with a test still owed does not count.</p>`;
 
-  $("rec").innerHTML = REC.map(([k, lab]) => `<div class="rec-row${fr(s, "rec-" + k)}"><span class="k">${lab}</span><span class="${s.rec[k] ? "" : "none"}">${s.rec[k] ? esc(s.rec[k]) : "not written yet"}</span></div>`).join("");
+  $("rec").innerHTML = recHTML(s);
   REC.forEach(([k]) => $("lr-" + k).classList.toggle("off", !s.rec[k]));
 
   const hs = Object.values(s.hyps);
@@ -1018,8 +1658,8 @@ function buildTicks() {
     const row = cyc.querySelector(".cyc-ticks");
     for (const [t, i] of items) {
       const b = document.createElement("button");
-      b.type = "button"; b.dataset.jump = i; b.className = `tick ${NODES[t.n].when}${t.fail ? " fail" : ""}`;
-      b.title = NODES[t.n].tag; b.setAttribute("aria-label", `Moment ${i + 1}: ${NODES[t.n].name}`);
+      b.type = "button"; b.dataset.jump = i; b.className = `tick ${P.nodes[t.n].when}${t.fail ? " fail" : ""}`;
+      b.title = P.nodes[t.n].tag; b.setAttribute("aria-label", `Moment ${i + 1}: ${P.nodes[t.n].name}`);
       row.appendChild(b);
     }
     box.appendChild(cyc);
@@ -1028,14 +1668,14 @@ function buildTicks() {
 function paintTicks() {
   document.querySelectorAll(".tick").forEach((b) => { const i = +b.dataset.jump; b.classList.toggle("past", i < pos); b.classList.toggle("now", i === pos); if (i === pos) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current"); });
   const e = ex.trace[pos];
-  $("where").textContent = `Moment ${pos + 1} of ${ex.trace.length} · ${ex.cycles[e.c].split(",")[0]} · ${NODES[e.n].tag}`;
+  $("where").textContent = `Moment ${pos + 1} of ${ex.trace.length} · ${ex.cycles[e.c].split(",")[0]} · ${P.nodes[e.n].tag}`;
   $("prev").disabled = pos === 0; $("next").disabled = pos === ex.trace.length - 1;
 }
 
 /* ---------- Control ---------- */
 function render(walk) {
   const s = fold(pos);
-  paintTicks(); paintMap(); renderReadout(s); renderBook(s);
+  paintTicks(); paintMap(); renderReadout(s); P.render(s);
   if (walk) animate(pathOf(pos)); else { token++; $("dot").setAttribute("cx", -20); }
 }
 function go(i, walk) { pos = Math.max(0, Math.min(ex.trace.length - 1, i)); view = null; render(walk); }
@@ -1047,7 +1687,7 @@ function pause() { clearTimeout(timer); timer = null; $("play").textContent = "�
 $("play").addEventListener("click", () => timer ? pause() : play());
 $("next").addEventListener("click", () => { pause(); go(pos + 1, true); });
 $("prev").addEventListener("click", () => { pause(); go(pos - 1, false); });
-$("example").addEventListener("change", (e) => { pause(); ex = EXAMPLES[+e.target.value]; pos = 0; view = null; buildTicks(); render(false); });
+$("example").addEventListener("change", (e) => { pause(); ex = P.examples[+e.target.value]; pos = 0; view = null; buildTicks(); render(false); });
 document.querySelectorAll("[data-speed]").forEach((b) => b.addEventListener("click", () => {
   speed = +b.dataset.speed; document.querySelectorAll("[data-speed]").forEach((o) => o.setAttribute("aria-pressed", o === b)); if (timer) schedule();
 }));
@@ -1061,5 +1701,73 @@ document.addEventListener("keydown", (e) => {
   else if (e.key === "ArrowLeft") { e.preventDefault(); pause(); go(pos - 1, false); }
   else if (e.key === " " && !e.target.closest("button")) { e.preventDefault(); timer ? pause() : play(); }
 });
-buildMap(); buildTicks(); render(false);
+
+/* ---------- Page two's notebook ---------- */
+const fmtOff = (d) => (d > 0.0049 ? "+" : d < -0.0049 ? "−" : "") + Math.abs(d).toFixed(2);
+function renderKaggleBook(s) {
+  renderObjective($("kobjective"), s);
+  const lv = Object.values(s.levers).sort((a, b) => (b.status === "blocked") - (a.status === "blocked"));
+  $("kledger").innerHTML = lv.length ? `<table class="lt"><thead><tr><th>Lever</th><th>Public size, source</th><th>Local size</th><th>Saturation</th><th>Cost per point</th><th>Status</th></tr></thead><tbody>${lv.map((l) => `<tr class="${fr(s, "lev-" + l.id).trim()}"><td>${esc(l.name)}</td><td>${esc(l.pub || "—")}</td><td>${esc(l.local || "—")}</td><td>${esc(l.sat || "—")}</td><td>${esc(l.cpp || "—")}</td><td><span class="chip ${l.status}">${esc(l.status)}${l.note ? ", " + esc(l.note) : ""}</span></td></tr>`).join("")}</tbody></table>` : `<p class="empty">Empty. The ledger is seeded from public work at K2.</p>`;
+  const ps = Object.values(s.pairs);
+  const order = [...new Set(ps.map((p) => p.regime))];
+  ps.sort((a, b) => order.indexOf(a.regime) - order.indexOf(b.regime) || a.phase - b.phase);
+  $("kpairs").innerHTML = ps.length ? `<table class="lt"><thead><tr><th>Regime, phase</th><th class="num">Local</th><th class="num">Public</th><th class="num">Offset</th><th class="num">Tolerance</th><th>Verdict</th></tr></thead><tbody>${ps.map((p) => `<tr class="${fr(s, "pair-" + p.id).trim()}"><td>${esc(p.regime)}, phase ${p.phase}</td><td class="num">${p.local.toFixed(2)}</td><td class="num">${p.pub.toFixed(2)}</td><td class="num">${fmtOff(p.pub - p.local)}</td><td class="num">${p.tol == null ? "—" : "± " + p.tol.toFixed(2)}</td><td>${p.verdict ? `<span class="chip ${p.verdict}">${p.verdict === "calibration" ? "calibration" : p.verdict + " tolerance"}</span> ${esc(p.say || "")}` : "—"}</td></tr>`).join("")}</tbody></table>` : `<p class="empty">No submission yet.</p>`;
+  $("ktree").innerHTML = treeHTML(s, "Empty. A question opens at L1 or when a pair falls outside tolerance.");
+  $("krec").innerHTML = recHTML(s);
+  $("kfinds").innerHTML = findsHTML(s);
+  const bs = Object.values(s.blocked);
+  $("kblocked").innerHTML = bs.length ? bs.map((b) => `<div class="bl-card${fr(s, "blk-" + b.id)}"><div class="fh"><span class="mono" style="font-weight:500">${b.id}</span><b>${esc(b.name)}</b><span class="chip blocked">blocked</span></div><dl><div><dt>Constraint</dt><dd>${esc(b.constraint)}</dd></div><div><dt>Gain</dt><dd>${esc(b.gain)}</dd></div><div><dt>Cost</dt><dd>${esc(b.cost)}</dd></div><div><dt>Proposal</dt><dd>${esc(b.proposal)}</dd></div></dl></div>`).join("") : `<p class="empty">None yet.</p>`;
+}
+
+/* ---------- The two pages share everything above; a page supplies its own data and its own notebook ---------- */
+const PAGES = {
+  base: {id:"base", title:"Strong Inference Workflow", nodes:NODES, edges:EDGES, examples:EXAMPLES, group:Object.fromEntries(KNOW.map((k) => [k, "know"])), rec:REC, recn:RECN,
+    viewBox:"0 -26 1030 676", mapLabel:"The cycle. Select any box to read about it.",
+    options:["Example 1: a local score that misleads (3 cycles)", "Example 2: a reported gain with several causes (2 rounds)"],
+    frames(svg) {
+      el("rect", {x:175,y:28,width:280,height:150,class:"frame solid"}, svg);
+      el("text", {x:187,y:44,class:"frame-t"}, svg, "Know the field: loop until a question is worth pursuing");
+      el("rect", {x:648,y:138,width:344,height:258,class:"frame"}, svg);
+      el("text", {x:986,y:148,"text-anchor":"end",class:"frame-t"}, svg, "discovery phase");
+    },
+    render: renderBook},
+  kaggle: {id:"kaggle", title:"Strong Inference on a Kaggle Competition", nodes:KNODES, edges:KEDGES, examples:[KEX], group:{trig:"frame", riv:"frame", base:"frame"}, rec:KREC, recn:KRECN,
+    viewBox:"0 0 1030 775", mapLabel:"The cycle as a competition drives it. Select any box to read about it.",
+    options:["An invented competition: two levers, then a pair outside tolerance (26 moments)"],
+    frames(svg) {
+      el("rect", {x:441,y:442,width:357,height:161,rx:4,class:"frame"}, svg);
+      el("text", {x:449,y:456,class:"frame-t"}, svg, "Inner loop: strong inference on a puzzle");
+      const note = (x, y, lines) => lines.forEach((l, i) => el("text", {x, y:y + i * 11.5, class:"frame-t", style:"font-size:10.5px"}, svg, l));
+      note(14, 195, ["Submissions per day and calendar time", "are watched, not sized against."]);
+      note(903, 397, ["Inside when the", "deviation from the", "regime’s offset is", "below the tolerance;", "on the edge counts", "as outside."]);
+      note(806, 510, ["Unchanged from the base and not redrawn:", "the cycle’s steps, the tree, the path of", "a finding, the branch gate."]);
+    },
+    render: renderKaggleBook},
+};
+
+/* ---------- Page switch: a hash route, so back and forward work ---------- */
+function setPage(id) {
+  pause();
+  P = PAGES[id];
+  document.title = P.title;
+  for (const k in PAGES) {
+    $("hd-" + k).hidden = k !== id; $("pg-" + k).hidden = k !== id; $("tab-" + k).removeAttribute("aria-current");
+  }
+  $("tab-" + id).setAttribute("aria-current", "page");
+  $("mapfoot").hidden = id !== "base"; $("mapfoot-kaggle").hidden = id !== "kaggle";
+  document.querySelectorAll("[data-only]").forEach((n) => { n.hidden = n.dataset.only !== id; });
+  const sel = $("example"); sel.innerHTML = P.options.map((t, i) => `<option value="${i}">${esc(t)}</option>`).join(""); sel.hidden = P.options.length < 2;
+  ex = P.examples[0]; pos = 0; view = null;
+  buildMap(); buildTicks(); render(false);
+}
+let first = true;
+function route() {
+  const id = location.hash === "#kaggle" ? "kaggle" : "base";
+  if (P && P.id === id) return;
+  setPage(id);
+  if (!first) window.scrollTo(0, 0);
+  first = false;
+}
+window.addEventListener("hashchange", route);
+route();
 </script>
