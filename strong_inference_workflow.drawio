@@ -201,7 +201,7 @@
                 <mxCell id="si-p3" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=13;" value="Predictions of H3" vertex="1">
                     <mxGeometry height="50" width="105" x="1175" y="400" as="geometry"/>
                 </mxCell>
-                <mxCell id="bW4NQQmewjmJznq9_Is1-33" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" value="&lt;b&gt;6. Design the crucial experiment&lt;/b&gt;&lt;br&gt;Before running, write which hypotheses each outcome excludes, what would count as a refutation (effect size, seeds or replications, power), which auxiliary assumptions may be blamed, plus the controls. It must be informative either way. Map every outcome before the run; one that excludes nothing is written as such, never dressed as an exclusion. Seeds and the rule read the family's own noise floor." vertex="1">
+                <mxCell id="bW4NQQmewjmJznq9_Is1-33" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" value="&lt;b&gt;6. Design the crucial experiment&lt;/b&gt;&lt;br&gt;Before running, write which hypotheses each outcome excludes, what would count as a refutation (effect size, seeds or replications, power), which auxiliary assumptions may be blamed, plus the controls. It must be informative either way. Map every outcome before the run; one that excludes nothing is written as such, never dressed as an exclusion. Seeds and the rule read the family's own noise floor. A result within the floor of a predicted gain is undecided." vertex="1">
                     <mxGeometry height="120" width="480" x="930" y="540" as="geometry"/>
                 </mxCell>
                 <mxCell id="bW4NQQmewjmJznq9_Is1-35" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" value="&lt;b&gt;7. Run the experiment&lt;/b&gt;&lt;br&gt;Before reading the result, check the run matched the design: code, data, statistics" vertex="1">
@@ -350,6 +350,18 @@
                             <mxPoint x="845" y="40"/>
                         </Array>
                     </mxGeometry>
+                </mxCell>
+                <mxCell id="si3-parked-use" edge="1" parent="1" source="si2-parked" style="edgeStyle=none;html=1;rounded=0;endArrow=block;exitX=0.8;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#b85450;strokeWidth=2;labelBackgroundColor=#ffffff;fontSize=12;" target="si-use" value="a corroborated part may be used">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1423" y="8"/>
+                            <mxPoint x="5" y="8"/>
+                            <mxPoint x="5" y="840"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="si3-lever-note" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=11;" value="A lever rung: met &#8594; One. Within the floor of the prediction &#8594; undecided. Below it &#8594; None; next rung." vertex="1">
+                    <mxGeometry height="58" width="165" x="232" y="604" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>
